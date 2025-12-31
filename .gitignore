@@ -1,0 +1,30 @@
+# Binaries
+/dist/
+/bin/
+drime
+drime.exe
+drime-shell
+drime-shell.exe
+
+# OS specific
+.DS_Store
+Thumbs.db
+
+# Sensitive captures
+*.har
+*.har.gz
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Go
+vendor/
+go.work
+coverage.out
+coverage.html
+
+# Environment
+.env

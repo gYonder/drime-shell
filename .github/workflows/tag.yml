@@ -1,0 +1,32 @@
+name: Bump Version
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  tag:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: '0'
+      
+      - name: Bump version and push tag
+        uses: anothrNick/github-tag-action@1.67.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG_PREFIX: v
+          DEFAULT_BUMP: none
+          PRERELEASE: false
+          # Conventional Commits mapping
+          # Major: conventional commits breaking marker, e.g. `feat!: ...` or `feat(scope)!: ...`
+          MAJOR_STRING_TOKEN: "!:"
+          # Minor/Patch: use tokens that also match scoped commits: `feat(scope): ...`, `fix(scope): ...`
+          MINOR_STRING_TOKEN: "feat"
+          PATCH_STRING_TOKEN: "fix"
+          NONE_STRING_TOKEN: "#none"
+

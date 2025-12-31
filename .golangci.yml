@@ -1,0 +1,25 @@
+# yaml-language-server: $schema=https://golangci-lint.run/jsonschema/golangci.jsonschema.json
+linters:
+  enable:
+    - errcheck
+    - gosimple
+    - govet
+    - ineffassign
+    - staticcheck
+    - unused
+    - misspell
+
+linters-settings:
+  govet:
+    disable:
+      - fieldalignment
+  errcheck:
+    exclude-functions:
+      - (net/http.ResponseWriter).Write
+      - (io.Writer).Write
+
+issues:
+  exclude-rules:
+    - path: _test\.go
+      linters:
+        - errcheck
