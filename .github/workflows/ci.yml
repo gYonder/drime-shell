@@ -14,7 +14,24 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  # Fast lint - runs on all pushes and PRs
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: true
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v6
+        with:
+          version: latest
+          args: --fast --timeout=2m
+
+  # Full test suite - only on Release PRs and other PRs
   test:
+    if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -28,10 +45,18 @@ jobs:
           go mod tidy
           git diff --exit-code go.mod go.sum
 
-      - name: Test
-        run: make test
+      - name: Test with coverage
+        run: go test -race -coverprofile=coverage.out -covermode=atomic ./...
 
-  lint:
+      - name: Upload coverage
+        uses: codecov/codecov-action@v4
+        with:
+          files: coverage.out
+          fail_ci_if_error: false
+
+  # Thorough checks - only on Release PRs
+  release-checks:
+    if: github.event_name == 'pull_request' && startsWith(github.head_ref, 'release-please--')
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -39,8 +64,20 @@ jobs:
         with:
           go-version-file: go.mod
           cache: true
-      - name: golangci-lint
+
+      - name: Full lint (no --fast)
         uses: golangci/golangci-lint-action@v6
         with:
           version: latest
           args: --timeout=5m
+
+      - name: Build all targets
+        run: |
+          GOOS=linux GOARCH=amd64 go build -o /dev/null ./cmd/drime
+          GOOS=linux GOARCH=arm64 go build -o /dev/null ./cmd/drime
+          GOOS=darwin GOARCH=amd64 go build -o /dev/null ./cmd/drime
+          GOOS=darwin GOARCH=arm64 go build -o /dev/null ./cmd/drime
+          GOOS=windows GOARCH=amd64 go build -o /dev/null ./cmd/drime
+
+      - name: Test with race detector
+        run: go test -race -count=1 ./...
