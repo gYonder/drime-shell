@@ -98,7 +98,7 @@ func loginCmd(ctx context.Context, s *session.Session, env *ExecutionEnv, args [
 	deviceName := fmt.Sprintf("drime-shell@%s", hostname)
 
 	// Call login API
-	user, err := ui.WithSpinner(env.Stdout, "", func() (*struct {
+	user, err := ui.WithSpinner(env.Stdout, "", false, func() (*struct {
 		Email       string
 		ID          int64
 		AccessToken string

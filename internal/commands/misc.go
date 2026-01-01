@@ -93,7 +93,7 @@ func unzip(ctx context.Context, s *session.Session, env *ExecutionEnv, args []st
 	parentDir := filepath.Dir(resolved)
 	parentEntry, _ := s.Cache.Get(parentDir)
 
-	err = ui.WithSpinnerErr(os.Stderr, "", func() error {
+	err = ui.WithSpinnerErr(os.Stderr, "", false, func() error {
 		// Extract the archive
 		if err := s.Client.ExtractEntry(ctx, entry.ID, entry.ParentID, s.WorkspaceID); err != nil {
 			return err
@@ -277,7 +277,7 @@ func zipCmd(ctx context.Context, s *session.Session, env *ExecutionEnv, args []s
 	}
 
 	var uploadedEntry *api.FileEntry
-	err = ui.WithSpinnerErr(os.Stderr, "", func() error {
+	err = ui.WithSpinnerErr(os.Stderr, "", false, func() error {
 		var err error
 		uploadedEntry, err = s.Client.Upload(ctx, uploadReader, filepath.Base(destResolved), parentID, uploadSize, s.WorkspaceID)
 		return err
@@ -305,7 +305,7 @@ func addFileToZip(ctx context.Context, s *session.Session, zw *zip.Writer, entry
 
 	// Download file content to memory
 	content := new(bytes.Buffer)
-	_, err := ui.WithSpinner(io.Discard, "", func() (*api.FileEntry, error) {
+	_, err := ui.WithSpinner(io.Discard, "", false, func() (*api.FileEntry, error) {
 		return s.Client.Download(ctx, entry.Hash, content, nil)
 	})
 	if err != nil {
@@ -341,7 +341,7 @@ func addLargeFileToZip(ctx context.Context, s *session.Session, zw *zip.Writer, 
 	}()
 
 	// Download to temp file
-	_, err = ui.WithSpinner(io.Discard, "", func() (*api.FileEntry, error) {
+	_, err = ui.WithSpinner(io.Discard, "", false, func() (*api.FileEntry, error) {
 		return s.Client.Download(ctx, entry.Hash, tempFile, nil)
 	})
 	if err != nil {
@@ -392,7 +392,7 @@ func addFolderToZip(ctx context.Context, s *session.Session, zw *zip.Writer, ent
 			os.Remove(tempFile.Name())
 		}()
 
-		_, err = ui.WithSpinner(io.Discard, "", func() (*api.FileEntry, error) {
+		_, err = ui.WithSpinner(io.Discard, "", false, func() (*api.FileEntry, error) {
 			return s.Client.Download(ctx, entry.Hash, tempFile, nil)
 		})
 		if err != nil {
@@ -410,7 +410,7 @@ func addFolderToZip(ctx context.Context, s *session.Session, zw *zip.Writer, ent
 	} else {
 		// Download to memory
 		content := new(bytes.Buffer)
-		_, err := ui.WithSpinner(io.Discard, "", func() (*api.FileEntry, error) {
+		_, err := ui.WithSpinner(io.Discard, "", false, func() (*api.FileEntry, error) {
 			return s.Client.Download(ctx, entry.Hash, content, nil)
 		})
 		if err != nil {

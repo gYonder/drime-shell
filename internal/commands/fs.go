@@ -111,7 +111,7 @@ func mkdirOne(ctx context.Context, s *session.Session, env *ExecutionEnv, path s
 	currentPath := existingPath
 	var lastEntry *api.FileEntry
 
-	err = ui.WithSpinnerErr(env.Stderr, "", func() error {
+	err = ui.WithSpinnerErr(env.Stderr, "", false, func() error {
 		for _, name := range toCreate {
 			// Get parent ID
 			var parentID *int64
@@ -202,7 +202,7 @@ func rm(ctx context.Context, s *session.Session, env *ExecutionEnv, args []strin
 	deletedCount := 0
 	movedToTrash := false
 
-	err := ui.WithSpinnerErr(env.Stderr, "", func() error {
+	err := ui.WithSpinnerErr(env.Stderr, "", false, func() error {
 		var ids []int64
 		var resolvedPaths []string
 

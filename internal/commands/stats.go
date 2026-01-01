@@ -60,7 +60,7 @@ func stat(ctx context.Context, s *session.Session, env *ExecutionEnv, args []str
 	}
 
 	// Fetch fresh details from API (with spinner for slow requests)
-	entry, _ := ui.WithSpinner(env.Stdout, "", func() (*api.FileEntry, error) {
+	entry, _ := ui.WithSpinner(env.Stdout, "", false, func() (*api.FileEntry, error) {
 		return s.Client.GetEntry(ctx, cached.ID, s.WorkspaceID)
 	})
 	if entry == nil {

@@ -72,7 +72,7 @@ func readFileToString(ctx context.Context, s *session.Session, path string) (str
 	}
 
 	// Download with vault decryption if needed
-	content, err := ui.WithSpinner(os.Stderr, "", func() ([]byte, error) {
+	content, err := ui.WithSpinner(os.Stderr, "", false, func() ([]byte, error) {
 		return DownloadAndDecrypt(ctx, s, entry)
 	})
 	if err != nil {

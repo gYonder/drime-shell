@@ -34,7 +34,7 @@ func cat(ctx context.Context, s *session.Session, env *ExecutionEnv, args []stri
 		}
 
 		// Download content (with vault decryption if needed)
-		content, err := ui.WithSpinner(env.Stderr, "", func() ([]byte, error) {
+		content, err := ui.WithSpinner(env.Stderr, "", false, func() ([]byte, error) {
 			return DownloadAndDecrypt(ctx, s, entry)
 		})
 		if err != nil {

@@ -108,7 +108,7 @@ func vaultCmd(ctx context.Context, s *session.Session, env *ExecutionEnv, args [
 // If the vault is locked, it prompts for the password first.
 func switchToVault(ctx context.Context, s *session.Session, env *ExecutionEnv) error {
 	// Check if vault exists
-	vaultMeta, err := ui.WithSpinner(env.Stdout, "", func() (*api.VaultMeta, error) {
+	vaultMeta, err := ui.WithSpinner(env.Stdout, "", false, func() (*api.VaultMeta, error) {
 		return s.Client.GetVaultMetadata(ctx)
 	})
 	if err != nil {
@@ -134,7 +134,7 @@ func switchToVault(ctx context.Context, s *session.Session, env *ExecutionEnv) e
 	}
 
 	// Load vault folder tree and switch context
-	err = ui.WithSpinnerErr(env.Stderr, "", func() error {
+	err = ui.WithSpinnerErr(env.Stderr, "", false, func() error {
 		vaultCache := api.NewFileCache()
 		if err := vaultCache.LoadVaultFolderTree(ctx, s.Client, s.UserID, s.Username); err != nil {
 			return fmt.Errorf("failed to load vault folders: %w", err)
@@ -165,7 +165,7 @@ func unlockVault(ctx context.Context, s *session.Session, env *ExecutionEnv) err
 	}
 
 	// Check if vault exists
-	vaultMeta, err := ui.WithSpinner(env.Stdout, "", func() (*api.VaultMeta, error) {
+	vaultMeta, err := ui.WithSpinner(env.Stdout, "", false, func() (*api.VaultMeta, error) {
 		return s.Client.GetVaultMetadata(ctx)
 	})
 	if err != nil {
@@ -202,7 +202,7 @@ func unlockVaultWithPrompt(ctx context.Context, s *session.Session, env *Executi
 
 	// Derive key and verify password
 	var vaultKey *crypto.VaultKey
-	err = ui.WithSpinnerErr(env.Stderr, "Unlocking vault...", func() error {
+	err = ui.WithSpinnerErr(env.Stderr, "Unlocking vault...", false, func() error {
 		// Decode salt from base64
 		salt, err := crypto.DecodeBase64(vaultMeta.Salt)
 		if err != nil {
@@ -266,7 +266,7 @@ func lockVault(ctx context.Context, s *session.Session, env *ExecutionEnv) error
 // initVault initializes a new vault with a password.
 func initVault(ctx context.Context, s *session.Session, env *ExecutionEnv) error {
 	// Check if vault already exists
-	vaultMeta, err := ui.WithSpinner(env.Stdout, "", func() (*api.VaultMeta, error) {
+	vaultMeta, err := ui.WithSpinner(env.Stdout, "", false, func() (*api.VaultMeta, error) {
 		return s.Client.GetVaultMetadata(ctx)
 	})
 	if err != nil {
@@ -307,7 +307,7 @@ func initVault(ctx context.Context, s *session.Session, env *ExecutionEnv) error
 	var salt, check, iv []byte
 	var vaultKey *crypto.VaultKey
 
-	err = ui.WithSpinnerErr(env.Stderr, "Creating vault...", func() error {
+	err = ui.WithSpinnerErr(env.Stderr, "Creating vault...", false, func() error {
 		// Generate random salt
 		var err error
 		salt, err = crypto.GenerateSalt()
@@ -332,7 +332,7 @@ func initVault(ctx context.Context, s *session.Session, env *ExecutionEnv) error
 	}
 
 	// Initialize vault on server
-	newVault, err := ui.WithSpinner(env.Stdout, "", func() (*api.VaultMeta, error) {
+	newVault, err := ui.WithSpinner(env.Stdout, "", false, func() (*api.VaultMeta, error) {
 		return s.Client.InitializeVault(ctx,
 			crypto.EncodeBase64(salt),
 			crypto.EncodeBase64(check),

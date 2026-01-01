@@ -155,7 +155,7 @@ func ResolveWorkspace(ctx context.Context, s *session.Session, target string) (i
 
 func listWorkspaces(ctx context.Context, s *session.Session, env *ExecutionEnv) error {
 	// Fetch workspaces from API (with caching)
-	workspaces, err := ui.WithSpinner(env.Stdout, "", func() ([]api.Workspace, error) {
+	workspaces, err := ui.WithSpinner(env.Stdout, "", false, func() ([]api.Workspace, error) {
 		return s.Client.GetWorkspaces(ctx)
 	})
 	if err != nil {
@@ -212,7 +212,7 @@ func switchWorkspace(ctx context.Context, s *session.Session, env *ExecutionEnv,
 	}
 
 	// Switch workspace: clear cache and reload folder tree
-	err = ui.WithSpinnerErr(env.Stderr, "", func() error {
+	err = ui.WithSpinnerErr(env.Stderr, "", false, func() error {
 		newCache := api.NewFileCache()
 		if err := newCache.LoadFolderTree(ctx, s.Client, s.UserID, s.Username, targetWsID); err != nil {
 			return fmt.Errorf("failed to load folder tree: %w", err)
@@ -244,7 +244,7 @@ func switchWorkspace(ctx context.Context, s *session.Session, env *ExecutionEnv,
 	} else {
 		fmt.Fprintf(env.Stdout, "Switched to workspace '%s'\n", ui.WorkspaceStyle.Render(targetWsName))
 		// Fetch and display workspace stats with spinner (skip for default workspace - too slow)
-		stats, err := ui.WithSpinner(env.Stderr, "", func() (*api.WorkspaceStats, error) {
+		stats, err := ui.WithSpinner(env.Stderr, "", false, func() (*api.WorkspaceStats, error) {
 			return s.Client.GetWorkspaceStats(ctx, targetWsID)
 		})
 		if err == nil && stats != nil {
@@ -261,7 +261,7 @@ func createWorkspace(ctx context.Context, s *session.Session, env *ExecutionEnv,
 		return fmt.Errorf("workspace name is required")
 	}
 
-	ws, err := ui.WithSpinner(env.Stdout, "", func() (*api.Workspace, error) {
+	ws, err := ui.WithSpinner(env.Stdout, "", false, func() (*api.Workspace, error) {
 		return s.Client.CreateWorkspace(ctx, name)
 	})
 	if err != nil {
@@ -289,7 +289,7 @@ func renameWorkspace(ctx context.Context, s *session.Session, env *ExecutionEnv,
 		return fmt.Errorf("new name is required")
 	}
 
-	ws, err := ui.WithSpinner(env.Stdout, "", func() (*api.Workspace, error) {
+	ws, err := ui.WithSpinner(env.Stdout, "", false, func() (*api.Workspace, error) {
 		return s.Client.UpdateWorkspace(ctx, s.WorkspaceID, newName)
 	})
 	if err != nil {
@@ -362,7 +362,7 @@ func deleteWorkspace(ctx context.Context, s *session.Session, env *ExecutionEnv,
 		return nil
 	}
 
-	err := ui.WithSpinnerErr(env.Stdout, "", func() error {
+	err := ui.WithSpinnerErr(env.Stdout, "", false, func() error {
 		if err := s.Client.DeleteWorkspace(ctx, workspaceID); err != nil {
 			return err
 		}

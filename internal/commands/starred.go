@@ -114,7 +114,7 @@ func starCmd(ctx context.Context, s *session.Session, env *ExecutionEnv, args []
 	}
 
 	var refreshErr error
-	err := ui.WithSpinnerErr(env.Stderr, "", func() error {
+	err := ui.WithSpinnerErr(env.Stderr, "", false, func() error {
 		if err := s.Client.StarEntries(ctx, entryIDs, s.WorkspaceID); err != nil {
 			return err
 		}
@@ -140,7 +140,7 @@ func starCmd(ctx context.Context, s *session.Session, env *ExecutionEnv, args []
 func starredList(ctx context.Context, s *session.Session, env *ExecutionEnv, args []string) error {
 	opts := api.ListOptions(s.WorkspaceID).WithStarredOnly()
 
-	entries, err := ui.WithSpinner(env.Stdout, "", func() ([]api.FileEntry, error) {
+	entries, err := ui.WithSpinner(env.Stdout, "", false, func() ([]api.FileEntry, error) {
 		return s.Client.ListByParentIDWithOptions(ctx, nil, opts)
 	})
 	if err != nil {
@@ -191,7 +191,7 @@ func unstarCmd(ctx context.Context, s *session.Session, env *ExecutionEnv, args 
 	}
 
 	var refreshErr error
-	err := ui.WithSpinnerErr(env.Stderr, "", func() error {
+	err := ui.WithSpinnerErr(env.Stderr, "", false, func() error {
 		if err := s.Client.UnstarEntries(ctx, entryIDs, s.WorkspaceID); err != nil {
 			return err
 		}

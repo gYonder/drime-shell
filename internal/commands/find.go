@@ -120,7 +120,7 @@ func find(ctx context.Context, s *session.Session, env *ExecutionEnv, args []str
 	var results []api.FileEntry
 	var err error
 
-	results, err = ui.WithSpinner(env.Stdout, "", func() ([]api.FileEntry, error) {
+	results, err = ui.WithSpinner(env.Stdout, "", false, func() ([]api.FileEntry, error) {
 		if parentID != nil {
 			// Search within specific folder (direct children only)
 			return s.Client.ListByParentIDWithOptions(ctx, parentID, opts)

@@ -59,7 +59,7 @@ func trashCmd(ctx context.Context, s *session.Session, env *ExecutionEnv, args [
 func trashList(ctx context.Context, s *session.Session, env *ExecutionEnv) error {
 	opts := api.ListOptions(s.WorkspaceID).WithDeletedOnly()
 
-	entries, err := ui.WithSpinner(env.Stdout, "", func() ([]api.FileEntry, error) {
+	entries, err := ui.WithSpinner(env.Stdout, "", false, func() ([]api.FileEntry, error) {
 		return s.Client.ListByParentIDWithOptions(ctx, nil, opts)
 	})
 	if err != nil {
@@ -173,7 +173,7 @@ func restoreCmd(ctx context.Context, s *session.Session, env *ExecutionEnv, args
 		return fmt.Errorf("no valid files to restore")
 	}
 
-	err = ui.WithSpinnerErr(env.Stderr, "", func() error {
+	err = ui.WithSpinnerErr(env.Stderr, "", false, func() error {
 		return s.Client.RestoreEntries(ctx, entryIDs, s.WorkspaceID)
 	})
 	if err != nil {
@@ -205,7 +205,7 @@ func trashEmpty(ctx context.Context, s *session.Session, env *ExecutionEnv) erro
 		return nil
 	}
 
-	err = ui.WithSpinnerErr(env.Stderr, "", func() error {
+	err = ui.WithSpinnerErr(env.Stderr, "", false, func() error {
 		return s.Client.EmptyTrash(ctx, s.WorkspaceID)
 	})
 	if err != nil {

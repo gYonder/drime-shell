@@ -99,7 +99,7 @@ func mv(ctx context.Context, s *session.Session, env *ExecutionEnv, args []strin
 		return deleteVaultSources(ctx, s, sources)
 	}
 
-	return ui.WithSpinnerErr(env.Stderr, "", func() error {
+	return ui.WithSpinnerErr(env.Stderr, "", false, func() error {
 		dest := args[len(args)-1]
 		sources := args[:len(args)-1]
 
@@ -378,7 +378,7 @@ func cp(ctx context.Context, s *session.Session, env *ExecutionEnv, args []strin
 		return copyFromVault(ctx, s, env, sources, dest, *recursive, *targetWorkspaceID)
 	}
 
-	return ui.WithSpinnerErr(env.Stderr, "", func() error {
+	return ui.WithSpinnerErr(env.Stderr, "", false, func() error {
 		dest := args[len(args)-1]
 		sources := args[:len(args)-1]
 
@@ -630,7 +630,7 @@ func touch(ctx context.Context, s *session.Session, env *ExecutionEnv, args []st
 		return fmt.Errorf("usage: touch <file>...")
 	}
 
-	return ui.WithSpinnerErr(env.Stderr, "", func() error {
+	return ui.WithSpinnerErr(env.Stderr, "", false, func() error {
 		for _, arg := range args {
 			resolved, err := s.ResolvePathArg(arg)
 			if err != nil {

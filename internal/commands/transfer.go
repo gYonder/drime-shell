@@ -742,7 +742,7 @@ func downloadDirectory(ctx context.Context, s *session.Session, env *ExecutionEn
 	// Download the folder as zip
 	fmt.Fprintf(env.Stdout, "Downloading %s...\n", entry.Name)
 
-	_, err = ui.WithSpinner(env.Stderr, "", func() (*api.FileEntry, error) {
+	_, err = ui.WithSpinner(env.Stderr, "", false, func() (*api.FileEntry, error) {
 		_, err := s.Client.Download(ctx, entry.Hash, tmpFile, nil)
 		tmpFile.Close()
 		return nil, err
@@ -828,7 +828,7 @@ func edit(ctx context.Context, s *session.Session, env *ExecutionEnv, args []str
 	}
 
 	// Download content (with decryption for vault)
-	contentBytes, err := ui.WithSpinner(env.Stderr, "", func() ([]byte, error) {
+	contentBytes, err := ui.WithSpinner(env.Stderr, "", false, func() ([]byte, error) {
 		return DownloadAndDecrypt(ctx, s, entry)
 	})
 	if err != nil {
@@ -853,7 +853,7 @@ func edit(ctx context.Context, s *session.Session, env *ExecutionEnv, args []str
 			}
 		}
 
-		err := ui.WithSpinnerErr(env.Stderr, "", func() error {
+		err := ui.WithSpinnerErr(env.Stderr, "", false, func() error {
 			if s.InVault {
 				// Vault: delete old, upload encrypted new
 				if err := s.Client.DeleteVaultEntries(ctx, []int64{entry.ID}); err != nil {

@@ -131,7 +131,7 @@ func listPathWithOpts(ctx context.Context, s *session.Session, path string, opts
 				parentID = &entry.ID
 			}
 			apiOpts := api.ListOptions(s.WorkspaceID).WithStarredOnly()
-			children, err := ui.WithSpinner(w, "", func() ([]api.FileEntry, error) {
+			children, err := ui.WithSpinner(w, "", false, func() ([]api.FileEntry, error) {
 				return s.Client.ListByParentIDWithOptions(ctx, parentID, apiOpts)
 			})
 			if err != nil {
@@ -155,12 +155,12 @@ func listPathWithOpts(ctx context.Context, s *session.Session, path string, opts
 				if resolved != "/" {
 					folderHash = entry.Hash
 				}
-				children, err = ui.WithSpinner(w, "", func() ([]api.FileEntry, error) {
+				children, err = ui.WithSpinner(w, "", false, func() ([]api.FileEntry, error) {
 					return s.Client.ListVaultEntries(ctx, folderHash)
 				})
 			} else {
 				apiOpts := api.ListOptions(s.WorkspaceID)
-				children, err = ui.WithSpinner(w, "", func() ([]api.FileEntry, error) {
+				children, err = ui.WithSpinner(w, "", false, func() ([]api.FileEntry, error) {
 					return s.Client.ListByParentIDWithOptions(ctx, parentID, apiOpts)
 				})
 			}

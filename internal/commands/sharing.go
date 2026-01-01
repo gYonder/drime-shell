@@ -109,7 +109,7 @@ func shareInvite(ctx context.Context, s *session.Session, env *ExecutionEnv, arg
 		permissions[i] = *role
 	}
 
-	err := ui.WithSpinnerErr(env.Stderr, "Sending invitations...", func() error {
+	err := ui.WithSpinnerErr(env.Stderr, "Sending invitations...", false, func() error {
 		return s.Client.ShareEntry(ctx, entry.ID, emails, permissions)
 	})
 	if err != nil {
@@ -198,7 +198,7 @@ func shareLink(ctx context.Context, s *session.Session, env *ExecutionEnv, args 
 
 	// Check if link already exists (to display existing settings)
 	var existingLink *api.ShareableLink
-	existingLink, _ = ui.WithSpinner(env.Stderr, "Checking link...", func() (*api.ShareableLink, error) {
+	existingLink, _ = ui.WithSpinner(env.Stderr, "Checking link...", false, func() (*api.ShareableLink, error) {
 		return s.Client.GetShareableLink(ctx, entry.ID)
 	})
 
@@ -230,11 +230,11 @@ func shareLink(ctx context.Context, s *session.Session, env *ExecutionEnv, args 
 			req.ExpiresAt = &expTime
 		}
 
-		link, err = ui.WithSpinner(env.Stderr, "Updating link...", func() (*api.ShareableLink, error) {
+		link, err = ui.WithSpinner(env.Stderr, "Updating link...", false, func() (*api.ShareableLink, error) {
 			return s.Client.UpdateShareableLink(ctx, entry.ID, req)
 		})
 	} else {
-		link, err = ui.WithSpinner(env.Stderr, "Creating link...", func() (*api.ShareableLink, error) {
+		link, err = ui.WithSpinner(env.Stderr, "Creating link...", false, func() (*api.ShareableLink, error) {
 			return s.Client.CreateShareableLink(ctx, entry.ID, req)
 		})
 	}
@@ -312,7 +312,7 @@ func shareList(ctx context.Context, s *session.Session, env *ExecutionEnv, args 
 			return fmt.Errorf("failed to get current user: %w", err)
 		}
 
-		entries, err = ui.WithSpinner(env.Stdout, "Fetching shared files...", func() ([]api.FileEntry, error) {
+		entries, err = ui.WithSpinner(env.Stdout, "Fetching shared files...", false, func() ([]api.FileEntry, error) {
 			var wg sync.WaitGroup
 			var mu sync.Mutex
 			var allEntries []api.FileEntry
@@ -404,7 +404,7 @@ func shareList(ctx context.Context, s *session.Session, env *ExecutionEnv, args 
 
 		opts := api.ListOptions(s.WorkspaceID).WithFilters(filters)
 
-		entries, err = ui.WithSpinner(env.Stdout, "Fetching shared files...", func() ([]api.FileEntry, error) {
+		entries, err = ui.WithSpinner(env.Stdout, "Fetching shared files...", false, func() ([]api.FileEntry, error) {
 			return s.Client.ListByParentIDWithOptions(ctx, nil, opts)
 		})
 		if err != nil {
