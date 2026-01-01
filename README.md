@@ -25,39 +25,17 @@ A modern, beautiful CLI shell for Drime Cloud built in Go. Provides an SSH-like 
 - **Trash Management** - Safe deletion with restore capability
 
 ## Installation
-
-### One-Line Install (Recommended)
-
-#### Linux & macOS
-
+ 
+### macOS & Linux
+ 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/mikael.mansson2/drime-shell/main/scripts/install.sh | sh
 ```
-
-#### Windows (PowerShell)
-
+ 
+### Windows (PowerShell)
+ 
 ```powershell
 iwr https://raw.githubusercontent.com/mikael.mansson2/drime-shell/main/scripts/install.ps1 | iex
-```
-
-### From Source
-
-```bash
-# Clone the repository
-git clone https://github.com/mikael.mansson2/drime-shell.git
-cd drime-shell
-
-# Build the binary
-go build -o drime ./cmd/drime
-
-# Install globally (optional)
-go install ./cmd/drime
-```
-
-### Using Go Install
-
-```bash
-go install github.com/mikael.mansson2/drime-shell/cmd/drime@latest
 ```
 
 ## Quick Start
