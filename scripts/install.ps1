@@ -25,10 +25,41 @@ $ZipPath = "$InstallDir\release.zip"
 Write-Host "Downloading $LatestUrl..."
 Invoke-WebRequest -Uri $LatestUrl -OutFile $ZipPath
 
+Write-Host "Downloading checksums..."
+$ChecksumsUrl = "https://github.com/$Owner/$Repo/releases/latest/download/checksums.txt"
+$ChecksumsPath = "$InstallDir\checksums.txt"
+Invoke-WebRequest -Uri $ChecksumsUrl -OutFile $ChecksumsPath
+
+Write-Host "Verifying checksum..."
+$ChecksumContent = Get-Content $ChecksumsPath
+$FileName = Split-Path $LatestUrl -Leaf
+$ExpectedLine = $ChecksumContent | Where-Object { $_.EndsWith($FileName) }
+
+if (-not $ExpectedLine) {
+    Throw "Checksum not found for $FileName in checksums.txt"
+}
+
+$ExpectedHash = ($ExpectedLine -split '\s+')[0].Trim()
+$ActualHash = (Get-FileHash $ZipPath -Algorithm SHA256).Hash.ToLower()
+
+if ($ExpectedHash -ne $ActualHash) {
+    Throw "Checksum verification failed!`nExpected: $ExpectedHash`nActual:   $ActualHash"
+}
+Write-Host "Checksum verified."
+
 Write-Host "Extracting..."
 Expand-Archive -Path $ZipPath -DestinationPath $InstallDir -Force
 
 $BinaryPath = "$InstallDir\$Binary"
+
+# Find the binary in case it's in a subdirectory
+$FoundBinary = Get-ChildItem -Path $InstallDir -Filter $Binary -Recurse -File | Select-Object -First 1
+
+if ($FoundBinary) {
+    if ($FoundBinary.DirectoryName -ne $InstallDir) {
+        Move-Item -Path $FoundBinary.FullName -Destination $BinaryPath -Force
+    }
+}
 
 if (Test-Path $BinaryPath) {
     Write-Host "Successfully installed to $BinaryPath"

@@ -25,16 +25,57 @@ esac
 echo "Finding latest release..."
 LATEST_URL="https://github.com/$OWNER/$REPO/releases/latest/download/${REPO}_${OS}_${ARCH}.${FORMAT}"
 
-echo "Downloading $LATEST_URL..."
 TMP_DIR=$(mktemp -d)
-curl -fsSL "$LATEST_URL" -o "$TMP_DIR/release.$FORMAT"
+
+echo "Downloading checksums..."
+CHECKSUMS_URL="https://github.com/$OWNER/$REPO/releases/latest/download/checksums.txt"
+curl -fsSL "$CHECKSUMS_URL" -o "$TMP_DIR/checksums.txt"
+
+echo "Downloading $LATEST_URL..."
+RELEASE_FILE="$TMP_DIR/release.$FORMAT"
+curl -fsSL "$LATEST_URL" -o "$RELEASE_FILE"
+
+echo "Verifying checksum..."
+# Extract just the checksum for our file
+EXPECTED_SUM=$(grep "$(basename "$LATEST_URL")" "$TMP_DIR/checksums.txt" | awk '{print $1}')
+
+if [ -z "$EXPECTED_SUM" ]; then
+  echo "Error: Could not find checksum for $(basename "$LATEST_URL")"
+  exit 1
+fi
+
+# Calculate local checksum
+if command -v sha256sum >/dev/null 2>&1; then
+  ACTUAL_SUM=$(sha256sum "$RELEASE_FILE" | awk '{print $1}')
+elif command -v shasum >/dev/null 2>&1; then
+  ACTUAL_SUM=$(shasum -a 256 "$RELEASE_FILE" | awk '{print $1}')
+else
+  echo "Warning: sha256sum/shasum not found, skipping verification."
+fi
+
+if [ -n "$ACTUAL_SUM" ] && [ "$EXPECTED_SUM" != "$ACTUAL_SUM" ]; then
+  echo "Error: Checksum verification failed!"
+  echo "Expected: $EXPECTED_SUM"
+  echo "Actual:   $ACTUAL_SUM"
+  exit 1
+fi
+echo "Checksum verified: $ACTUAL_SUM"
 
 echo "Extracting..."
 tar -xzf "$TMP_DIR/release.$FORMAT" -C "$TMP_DIR"
 
 echo "Installing to $BINDIR..."
 mkdir -p "$BINDIR"
-mv "$TMP_DIR/$BINARY" "$BINDIR/$BINARY"
+
+# Find the binary (handles whether it's in root or a subdir)
+FOUND_BIN=$(find "$TMP_DIR" -type f -name "$BINARY" | head -n 1)
+
+if [ -z "$FOUND_BIN" ]; then
+  echo "Error: Binary '$BINARY' not found in downloaded release"
+  exit 1
+fi
+
+mv "$FOUND_BIN" "$BINDIR/$BINARY"
 
 chmod +x "$BINDIR/$BINARY"
 rm -rf "$TMP_DIR"
