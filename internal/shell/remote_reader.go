@@ -46,7 +46,7 @@ func NewRemoteFileReader(ctx context.Context, s *session.Session, remotePath str
 
 	// For small files, download into memory
 	buf := new(bytes.Buffer)
-	err = ui.WithSpinnerErr(os.Stderr, "", func() error {
+	err = ui.WithSpinnerErr(os.Stderr, "", false, func() error {
 		_, err := s.Client.Download(ctx, entry.Hash, buf, nil)
 		return err
 	})
@@ -66,7 +66,7 @@ func newRemoteFileReaderWithTempFile(ctx context.Context, s *session.Session, ha
 		return nil, fmt.Errorf("failed to create temp file: %w", err)
 	}
 
-	err = ui.WithSpinnerErr(os.Stderr, "", func() error {
+	err = ui.WithSpinnerErr(os.Stderr, "", false, func() error {
 		_, err := s.Client.Download(ctx, hash, tempFile, nil)
 		return err
 	})

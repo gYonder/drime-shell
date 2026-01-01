@@ -42,7 +42,7 @@ func ExpandGlobs(ctx context.Context, s *session.Session, w io.Writer, args []st
 				}
 
 				// Fetch children with spinner
-				children, err := ui.WithSpinner(w, "", func() ([]api.FileEntry, error) {
+				children, err := ui.WithSpinner(w, "", false, func() ([]api.FileEntry, error) {
 					apiOpts := api.ListOptions(s.WorkspaceID)
 					return s.Client.ListByParentIDWithOptions(ctx, parentID, apiOpts)
 				})

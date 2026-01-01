@@ -142,7 +142,7 @@ func (w *RemoteFileWriter) Close() error {
 	}
 
 	// Upload with spinner for slow operations
-	return ui.WithSpinnerErr(os.Stderr, "", func() error {
+	return ui.WithSpinnerErr(os.Stderr, "", false, func() error {
 		var newEntry *api.FileEntry
 		var uploadErr error
 
