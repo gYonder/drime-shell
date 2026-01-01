@@ -11,8 +11,8 @@ import (
 var spinnerFrames = []string{"⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"}
 
 // WithSpinner runs an action while displaying a spinner. Returns the result of the action.
-// The spinner appears on a new line, only if the action takes longer than 100ms.
-func WithSpinner[T any](w io.Writer, message string, action func() (T, error)) (T, error) {
+// The spinner appears on a new line. If immediate is false, it waits 100ms before showing.
+func WithSpinner[T any](w io.Writer, message string, immediate bool, action func() (T, error)) (T, error) {
 	done := make(chan struct{})
 	var result T
 	var err error
@@ -24,36 +24,42 @@ func WithSpinner[T any](w io.Writer, message string, action func() (T, error)) (
 	}()
 
 	// Wait a bit before showing spinner (avoid flicker for fast operations)
-	select {
-	case <-done:
-		return result, err
-	case <-time.After(100 * time.Millisecond):
-		// Action is taking a while, show spinner
+	if !immediate {
+		select {
+		case <-done:
+			return result, err
+		case <-time.After(100 * time.Millisecond):
+			// Action is taking a while, show spinner
+		}
 	}
 
 	frame := 0
 	ticker := time.NewTicker(80 * time.Millisecond)
 	defer ticker.Stop()
 
-	// Print spinner on new line
-	fmt.Fprintf(os.Stderr, "%s", spinnerFrames[frame])
+	// Print spinner
+	if w == nil {
+		w = os.Stderr
+	}
+	
+	fmt.Fprintf(w, "\r%s %s", message, spinnerFrames[frame])
 
 	for {
 		select {
 		case <-done:
 			// Clear spinner line
-			fmt.Fprintf(os.Stderr, "\r\033[K")
+			fmt.Fprintf(w, "\r\033[K")
 			return result, err
 		case <-ticker.C:
 			frame = (frame + 1) % len(spinnerFrames)
-			fmt.Fprintf(os.Stderr, "\r%s", spinnerFrames[frame])
+			fmt.Fprintf(w, "\r%s %s", message, spinnerFrames[frame])
 		}
 	}
 }
 
 // WithSpinnerErr is like WithSpinner but for actions that only return an error
-func WithSpinnerErr(w io.Writer, message string, action func() error) error {
-	_, err := WithSpinner(w, message, func() (struct{}, error) {
+func WithSpinnerErr(w io.Writer, message string, immediate bool, action func() error) error {
+	_, err := WithSpinner(w, message, immediate, func() (struct{}, error) {
 		return struct{}{}, action()
 	})
 	return err
