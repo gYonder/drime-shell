@@ -1164,6 +1164,21 @@ SavedCache         *api.FileCache
 - `GET /file-entries/download/{hash}?encrypted=true` — Download encrypted
 - `POST /s3/entries` with `isEncrypted=1`, `vaultId`, `vaultIvs` — Create encrypted entry
 
+### 20. Human-like Coding Style
+
+**Decision**: Avoid "vibe coded" markers in source code and documentation.
+
+**Rationale**:
+- Code should look professional and human-written.
+- Excessive emojis in comments or documentation (outside of UI output) are distracting.
+- Robotic, redundant comments (e.g., `// 1. Do X`) should be replaced with natural language.
+
+**Guidelines**:
+- **No emojis in comments**: Keep source code comments clean.
+- **Natural comments**: Write comments as if explaining to a colleague, not a step-by-step robot.
+- **Professional Docs**: Use standard markdown lists instead of emoji bullet points in technical docs.
+- **UI Exceptions**: Emojis in *string literals* for CLI output are allowed and encouraged for the "Beautiful UI" goal.
+
 ---
 
 ## Command Implementation Details
@@ -1669,21 +1684,33 @@ When in doubt, prioritize:
 The project uses a fully automated release pipeline based on **Semantic Versioning** and **Conventional Commits**.
 
 1. **CI/CD**: GitHub Actions run `go test` and `golangci-lint` on every PR and push to `main`.
-2. **Versioning**: On changes merged into `main`, a GitHub Action scans commit messages since the last tag and creates a new tag **only when** a release-worthy change is present.
-3. **Releasing**: When a new tag is pushed, **GoReleaser** builds binaries for Linux, macOS, and Windows (amd64/arm64) and publishes them to GitHub Releases.
+2. **Versioning**: `release-please` maintains a Release PR using a manifest file (`.release-please-manifest.json`). It is currently configured for **beta releases** (`"prerelease": true` in `release-please-config.json`).
+   - Merging the Release PR creates tags like `v1.0.0-beta.1`.
+   - To graduate to stable, remove `"prerelease": true` from the config.
+3. **Releasing**: When a new tag is pushed, **GoReleaser** builds binaries for Linux, macOS, and Windows (amd64/arm64) and publishes them to GitHub Releases. It automatically detects beta tags and marks them as "Pre-release".
+4. **Security**: CodeQL runs on PRs, pushes to `main`, and weekly schedule.
+
+Note: For fully automated releases, configure a repo secret `RELEASE_PLEASE_TOKEN` (PAT) so that CI runs on Release PRs and tag pushes trigger downstream workflows. You must also enable "Allow GitHub Actions to create and approve pull requests" in repo settings.
+
+Workflows are in `.github/workflows/`.
 
 ### Installation Scripts
+
 We provide standalone install scripts in `scripts/` that fetch the latest release from GitHub:
+
 - `scripts/install.sh`: For Linux and macOS (Bash/Sh). Installs to `~/.local/bin` by default (override with `BINDIR=...`).
 - `scripts/install.ps1`: For Windows (PowerShell).
 
 ### Build Targets
+
 - **Linux**: amd64, arm64
 - **macOS**: amd64, arm64 (Apple Silicon)
 - **Windows**: amd64, arm64
 
 ### Conventional Commits
+
 All commits must follow the [Conventional Commits](https://www.conventionalcommits.org/) specification to trigger releases:
+
 - `feat` (including `feat(scope): ...`) -> Minor version bump (v1.1.0)
 - `fix` (including `fix(scope): ...`) -> Patch version bump (v1.0.1)
 - Breaking changes -> Major version bump (use the conventional `!` marker in the header, e.g. `feat!: ...` or `feat(scope)!: ...`)

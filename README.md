@@ -4,24 +4,25 @@ A modern, beautiful CLI shell for Drime Cloud built in Go. Provides an SSH-like 
 
 ![Go Version](https://img.shields.io/badge/Go-1.25+-00ADD8?style=flat&logo=go)
 ![CI](https://github.com/mikael.mansson2/drime-shell/actions/workflows/ci.yml/badge.svg)
+![CodeQL](https://github.com/mikael.mansson2/drime-shell/actions/workflows/codeql.yml/badge.svg)
 ![Release](https://img.shields.io/github/v/release/mikael.mansson2/drime-shell)
 ![License](https://img.shields.io/badge/License-MIT-blue.svg)
 
 ## Features
 
-- 🚀 **SSH-like Experience** - Navigate your cloud storage with familiar commands (`ls`, `cd`, `mkdir`, `rm`, etc.)
-- 🎨 **Beautiful UI** - Powered by the Charm ecosystem with syntax highlighting, colored output, and styled tables
-- 🌓 **Theme Support** - Auto-detects terminal theme with manual dark/light override
-- 📁 **Full File Operations** - Copy, move, delete, create files and directories remotely
-- 🔍 **Remote Execution** - `find` and `zip` execute server-side for performance
-- ⬆️ **File Transfer** - Upload and download files with progress bars
-- ✨ **Tab Completion** - Auto-complete paths and commands as you type
-- 📜 **Command History** - Persistent history across sessions
-- 🎯 **Glob Patterns** - Wildcard support (`*.txt`, `[a-z]*`, `*.{go,rs}`)
-- 🏢 **Workspaces** - Create, switch, and manage multiple workspaces
-- 🔐 **Encrypted Vault** - Zero-knowledge encrypted storage with client-side AES-256-GCM encryption
-- ⭐ **Starred Files** - Mark and filter important files
-- 🗑️ **Trash Management** - Safe deletion with restore capability
+- **SSH-like Experience** - Navigate your cloud storage with familiar commands (`ls`, `cd`, `mkdir`, `rm`, etc.)
+- **Beautiful UI** - Powered by the Charm ecosystem with syntax highlighting, colored output, and styled tables
+- **Theme Support** - Auto-detects terminal theme with manual dark/light override
+- **Full File Operations** - Copy, move, delete, create files and directories remotely
+- **Remote Execution** - `find` and `zip` execute server-side for performance
+- **File Transfer** - Upload and download files with progress bars
+- **Tab Completion** - Auto-complete paths and commands as you type
+- **Command History** - Persistent history across sessions
+- **Glob Patterns** - Wildcard support (`*.txt`, `[a-z]*`, `*.{go,rs}`)
+- **Workspaces** - Create, switch, and manage multiple workspaces
+- **Encrypted Vault** - Zero-knowledge encrypted storage with client-side AES-256-GCM encryption
+- **Starred Files** - Mark and filter important files
+- **Trash Management** - Safe deletion with restore capability
 
 ## Installation
 
@@ -752,6 +753,19 @@ go run -race ./cmd/drime
 | `alecthomas/chroma` | Syntax highlighting |
 | `bmatcuk/doublestar/v4` | Glob pattern matching |
 | `sergi/go-diff` | Diff output |
+
+## Releases
+
+This repo uses **release-please** + **GoReleaser**:
+
+1. Merge Conventional Commits into `main`.
+2. `release-please` opens/updates a Release PR.
+3. Merge the Release PR to create a SemVer tag (GoReleaser expects tags starting with `v`, e.g. `v1.2.3`).
+4. GoReleaser runs on the tag and publishes a GitHub Release + binaries.
+
+To make this fully automated, set a repo secret `RELEASE_PLEASE_TOKEN` (a PAT) so that tags/PRs created by release-please can trigger downstream workflows.
+
+Security scanning is handled by CodeQL on PRs, pushes to `main`, and a weekly schedule.
 
 ## Troubleshooting
 
