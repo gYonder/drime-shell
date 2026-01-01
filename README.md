@@ -703,7 +703,7 @@ For detailed implementation patterns, see [AGENTS.md](AGENTS.md).
 
 ### Prerequisites
 
-- Go 1.21 or later
+- Go 1.25 or later
 - Access to Drime Cloud API
 
 ### Building
@@ -734,16 +734,14 @@ go run -race ./cmd/drime
 
 ## Releases
 
-This repo uses **release-please** + **GoReleaser**:
+This project is currently in **beta**. Releases use **release-please** + **GoReleaser**:
 
-1. Merge Conventional Commits into `main`.
-2. `release-please` opens/updates a Release PR.
-3. Merge the Release PR to create a SemVer tag (GoReleaser expects tags starting with `v`, e.g. `v1.2.3`).
-4. GoReleaser runs on the tag and publishes a GitHub Release + binaries.
+1. Push commits to `main` using [Conventional Commits](https://www.conventionalcommits.org/) format.
+2. `release-please` creates/updates a Release PR automatically.
+3. When ready to release, merge the Release PR to create a tag (e.g., `v1.0.0-beta.1`).
+4. GoReleaser builds binaries for all platforms and publishes a GitHub Release.
 
-To make this fully automated, set a repo secret `RELEASE_PLEASE_TOKEN` (a PAT) so that tags/PRs created by release-please can trigger downstream workflows.
-
-Security scanning is handled by CodeQL on PRs, pushes to `main`, and a weekly schedule.
+Beta releases are marked as "Pre-release" on GitHub. Once stable, we'll remove the prerelease flag from `release-please-config.json`.
 
 ## Troubleshooting
 

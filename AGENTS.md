@@ -1683,7 +1683,10 @@ When in doubt, prioritize:
 ### Strategy
 The project uses a fully automated release pipeline based on **Semantic Versioning** and **Conventional Commits**.
 
-1. **CI/CD**: GitHub Actions run `go test` and `golangci-lint` on every PR and push to `main`.
+1. **CI/CD**: GitHub Actions with tiered validation:
+   - **Push to `main`**: Fast lint only (~30s) for quick feedback
+   - **Pull Requests**: Full test suite with coverage + fast lint
+   - **Release PRs**: Thorough checks including full lint, cross-compilation for all targets, and race-condition tests
 2. **Versioning**: `release-please` maintains a Release PR using a manifest file (`.release-please-manifest.json`). It is currently configured for **beta releases** (`"prerelease": true` in `release-please-config.json`).
    - Merging the Release PR creates tags like `v1.0.0-beta.1`.
    - To graduate to stable, remove `"prerelease": true` from the config.
@@ -1693,6 +1696,23 @@ The project uses a fully automated release pipeline based on **Semantic Versioni
 Note: For fully automated releases, configure a repo secret `RELEASE_PLEASE_TOKEN` (PAT) so that CI runs on Release PRs and tag pushes trigger downstream workflows. You must also enable "Allow GitHub Actions to create and approve pull requests" in repo settings.
 
 Workflows are in `.github/workflows/`.
+
+### Owner Workflow
+
+Day-to-day development (fast feedback):
+
+```bash
+git add . && git commit -m "feat: add feature" && git push
+# Only fast lint runs (~30s)
+```
+
+When ready to release:
+
+```bash
+# Merge the Release PR on GitHub (or via CLI)
+gh pr merge --squash "chore(main): release 1.0.0-beta.X"
+# Full validation runs, then GoReleaser builds binaries
+```
 
 ### Installation Scripts
 
