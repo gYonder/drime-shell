@@ -1738,3 +1738,10 @@ All commits must follow the [Conventional Commits](https://www.conventionalcommi
 
 Note: Sensitive HTTP capture files (`*.har`) are ignored and should not be committed.
 
+### Maintenance Automation
+
+**Dependabot** is configured to check for updates weekly.
+- Configuration: `.github/dependabot.yml`
+- Auto-merge: `.github/workflows/dependabot-auto-merge.yml` handles approval and squash-merging automatically.
+- **Requirement**: "Allow auto-merge" must be enabled in repository settings.
+
