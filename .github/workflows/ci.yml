@@ -23,11 +23,10 @@ jobs:
         with:
           go-version-file: go.mod
           cache: true
+      - name: Install golangci-lint
+        run: go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.63.4
       - name: golangci-lint
-        uses: golangci/golangci-lint-action@v9
-        with:
-          version: latest
-          args: --timeout=5m
+        run: golangci-lint run --timeout=5m
 
   # Full test suite - only on Release PRs and other PRs
   test:
@@ -65,11 +64,10 @@ jobs:
           go-version-file: go.mod
           cache: true
 
-      - name: Full lint (no --fast)
-        uses: golangci/golangci-lint-action@v9
-        with:
-          version: latest
-          args: --timeout=5m
+      - name: Install golangci-lint
+        run: go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.63.4
+      - name: Full lint
+        run: golangci-lint run --timeout=5m
 
       - name: Build all targets
         run: |

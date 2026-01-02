@@ -1,5 +1,4 @@
-# yaml-language-server: $schema=https://golangci-lint.run/jsonschema/golangci.jsonschema.json
-version: 2
+# golangci-lint v1.x configuration
 
 linters:
   enable:
