@@ -26,8 +26,8 @@ jobs:
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v9
         with:
-          version: v1.63.4
-          args: --fast --timeout=2m
+          version: latest
+          args: --timeout=5m
 
   # Full test suite - only on Release PRs and other PRs
   test:
@@ -68,7 +68,7 @@ jobs:
       - name: Full lint (no --fast)
         uses: golangci/golangci-lint-action@v9
         with:
-          version: v1.63.4
+          version: latest
           args: --timeout=5m
 
       - name: Build all targets
