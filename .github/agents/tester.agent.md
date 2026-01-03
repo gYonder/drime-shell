@@ -160,4 +160,3 @@ Tests run automatically on PRs:
 - Must pass before merge
 
 See `release-cicd` skill for full CI/CD pipeline details.
-```

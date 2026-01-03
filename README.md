@@ -3,9 +3,9 @@
 A modern CLI shell for Drime Cloud built in Go. Provides an SSH-like experience for navigating and managing files on your cloud storage.
 
 ![Go Version](https://img.shields.io/badge/Go-1.25+-00ADD8?style=flat&logo=go)
-![CI](https://github.com/mikael.mansson2/drime-shell/actions/workflows/ci.yml/badge.svg)
-![CodeQL](https://github.com/mikael.mansson2/drime-shell/actions/workflows/codeql.yml/badge.svg)
-![Release](https://img.shields.io/github/v/release/mikael.mansson2/drime-shell)
+![CI](https://github.com/mikael-mansson/drime-shell/actions/workflows/ci.yml/badge.svg)
+![CodeQL](https://github.com/mikael-mansson/drime-shell/actions/workflows/codeql.yml/badge.svg)
+![Release](https://img.shields.io/github/v/release/mikael-mansson/drime-shell)
 ![License](https://img.shields.io/badge/License-MIT-blue.svg)
 
 ## Features
@@ -23,12 +23,12 @@ A modern CLI shell for Drime Cloud built in Go. Provides an SSH-like experience 
  
 **macOS & Linux:**
 ```bash
-curl -fsSL https://raw.githubusercontent.com/mikael.mansson2/drime-shell/main/scripts/install.sh | sh
+curl -fsSL https://raw.githubusercontent.com/mikael-mansson/drime-shell/main/scripts/install.sh | sh
 ```
  
 **Windows (PowerShell):**
 ```powershell
-iwr https://raw.githubusercontent.com/mikael.mansson2/drime-shell/main/scripts/install.ps1 | iex
+iwr https://raw.githubusercontent.com/mikael-mansson/drime-shell/main/scripts/install.ps1 | iex
 ```
 
 ## Quick Start
