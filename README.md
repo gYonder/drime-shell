@@ -54,20 +54,20 @@ drime
 The shell uses a Powerline-style prompt with colored segments showing your username and current path:
 
 ```
- user ❯ ~/Projects ❯
+ mikael-mansson ❯ ~/Projects ❯
 ```
 
 When in a workspace or vault, additional segments appear:
 
 ```
- user ❯ ~ ❯ my-workspace ❯       # In a workspace
- user ❯ ~ ❯ vault:unlocked ❯    # In the vault
+ mikael-mansson ❯ ~ ❯ my-workspace ❯       # In a workspace
+ mikael-mansson ❯ ~ ❯ vault:unlocked ❯    # In the vault
 ```
 
 ### Example Session
 
 ```
- mikael.maansson ❯ ~ ❯ ls
+ mikael-mansson ❯ ~ ❯ ls
 222704736.pdf.zip                           ex.txt
 6089912.pdf                                 ex.txt - Copy
 Bildsamling/                                foo
@@ -77,7 +77,7 @@ README.md                                   temp/
 Tipsruta till Tomtepromenaden 2025.pdf      test.zip
 UploadFromMobile/                           xxx/
 
- mikael.maansson ❯ ~ ❯ cat ex.txt | head -n 5
+ mikael-mansson ❯ ~ ❯ cat ex.txt | head -n 5
 sdlkfjkadsjf
 
 sfasdfdsf
@@ -164,7 +164,7 @@ Zero-knowledge encrypted storage with client-side AES-256-GCM encryption.
 When in vault, the prompt shows the unlock status:
 
 ```
- user ❯ ~ ❯ vault:unlocked ❯
+ mikael-mansson ❯ ~ ❯ vault:unlocked ❯
 ```
 
 Cross-transfer using `--vault` flag or `-w <workspace>`:
@@ -181,8 +181,9 @@ cp -w 0 secret.pdf /Documents/   # Vault → Workspace (decrypts)
 |---------|-------------|
 | `alias` / `unalias` | Manage command aliases |
 | `whoami` | Show current user |
+| `du` | Show disk usage statistics |
 | `history` | Show command history |
-| `theme` | Set color theme (`auto`, `dark`, `light`) |
+| `clear` | Clear the screen |
 | `config` | View/edit configuration |
 | `login` / `logout` | Manage authentication |
 | `zip` / `unzip` | Create/extract archives (server-side) |
@@ -243,7 +244,7 @@ Token priority: `DRIME_TOKEN` env var → config file → interactive prompt.
 
 **Session expired:** Run `login` to re-authenticate.
 
-**Colors broken:** Try `theme dark` or check `TERM` variable.
+**Colors broken:** Set `theme: dark` in config or check `TERM` variable.
 
 ## Development
 
