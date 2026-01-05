@@ -51,41 +51,42 @@ mkdir -p ~/.drime-shell && echo "token: drm_your_token_here" > ~/.drime-shell/co
 drime
 ```
 
-The shell uses a Powerline-style prompt showing your username and current path:
+The shell uses a Powerline-style prompt with colored segments showing your username and current path:
 
-<pre style="background:#1e1e2e;color:#cdd6f4;padding:12px;border-radius:8px;font-family:monospace;">
-<span style="background:#89b4fa;color:#1e1e2e"> mikael.maansson </span><span style="background:#313244;color:#89b4fa">&#xe0b0;</span><span style="background:#313244;color:#cdd6f4"> ~/Projects </span><span style="color:#313244">&#xe0b0;</span>
-</pre>
+```
+ user ❯ ~/Projects ❯
+```
 
 When in a workspace or vault, additional segments appear:
 
-<pre style="background:#1e1e2e;color:#cdd6f4;padding:12px;border-radius:8px;font-family:monospace;">
-<span style="background:#89b4fa;color:#1e1e2e"> mikael.maansson </span><span style="background:#313244;color:#89b4fa">&#xe0b0;</span><span style="background:#313244;color:#cdd6f4"> ~ </span><span style="background:#cba6f7;color:#313244">&#xe0b0;</span><span style="background:#cba6f7;color:#1e1e2e"> test </span><span style="color:#cba6f7">&#xe0b0;</span>
-</pre>
-
-<pre style="background:#1e1e2e;color:#cdd6f4;padding:12px;border-radius:8px;font-family:monospace;">
-<span style="background:#89b4fa;color:#1e1e2e"> mikael.maansson </span><span style="background:#313244;color:#89b4fa">&#xe0b0;</span><span style="background:#313244;color:#cdd6f4"> ~ </span><span style="background:#a6e3a1;color:#313244">&#xe0b0;</span><span style="background:#a6e3a1;color:#1e1e2e"> vault:unlocked </span><span style="color:#a6e3a1">&#xe0b0;</span>
-</pre>
+```
+ user ❯ ~ ❯ my-workspace ❯       # In a workspace
+ user ❯ ~ ❯ vault:unlocked ❯    # In the vault
+```
 
 ### Example Session
 
-<pre style="background:#1e1e2e;color:#cdd6f4;padding:12px;border-radius:8px;font-family:monospace;">
-<span style="background:#89b4fa;color:#1e1e2e"> mikael.maansson </span><span style="background:#313244;color:#89b4fa">&#xe0b0;</span><span style="background:#313244;color:#cdd6f4"> ~ </span><span style="color:#313244">&#xe0b0;</span> ls
-<span style="color:#cba6f7">222704736.pdf.zip</span>                           ex.txt
-<span style="color:#cba6f7">6089912.pdf</span>                                 ex.txt - Copy
-<span style="color:#89b4fa">Bildsamling</span>                                 foo
-<span style="color:#cba6f7">Firefox 144.0.2.dmg</span>                         foobar
-<span style="color:#f9e2af">IMG_50291.jpg</span>                               <span style="color:#a6e3a1">rename.ts</span>
-<span style="color:#cdd6f4">README.md</span>                                   <span style="color:#89b4fa">temp</span>
-<span style="color:#cba6f7">Tipsruta till Tomtepromenaden 2025.pdf</span>      <span style="color:#cba6f7">test.zip</span>
-<span style="color:#89b4fa">UploadFromMobile</span>                            <span style="color:#89b4fa">xxx</span>
-<span style="background:#89b4fa;color:#1e1e2e"> mikael.maansson </span><span style="background:#313244;color:#89b4fa">&#xe0b0;</span><span style="background:#313244;color:#cdd6f4"> ~ </span><span style="color:#313244">&#xe0b0;</span> cat ex.txt | head -n 5
+```
+ mikael.maansson ❯ ~ ❯ ls
+222704736.pdf.zip                           ex.txt
+6089912.pdf                                 ex.txt - Copy
+Bildsamling/                                foo
+Firefox 144.0.2.dmg                         foobar
+IMG_50291.jpg                               rename.ts
+README.md                                   temp/
+Tipsruta till Tomtepromenaden 2025.pdf      test.zip
+UploadFromMobile/                           xxx/
+
+ mikael.maansson ❯ ~ ❯ cat ex.txt | head -n 5
 sdlkfjkadsjf
 
 sfasdfdsf
 
 adsff
-</pre>
+```
+
+> [!TIP]
+> The actual shell features colorized output with the Catppuccin theme — folders in blue, archives in purple, images in yellow, and code files in green.
 
 ## Commands
 
@@ -160,11 +161,11 @@ Zero-knowledge encrypted storage with client-side AES-256-GCM encryption.
 | `vault lock` | Lock (clears key from memory) |
 | `vault init` | First-time setup |
 
-When in vault, the prompt shows status:
+When in vault, the prompt shows the unlock status:
 
-<pre style="background:#1e1e2e;color:#cdd6f4;padding:12px;border-radius:8px;font-family:monospace;">
-<span style="background:#89b4fa;color:#1e1e2e"> mikael.maansson </span><span style="background:#313244;color:#89b4fa">&#xe0b0;</span><span style="background:#313244;color:#cdd6f4"> ~ </span><span style="background:#a6e3a1;color:#313244">&#xe0b0;</span><span style="background:#a6e3a1;color:#1e1e2e"> vault:unlocked </span><span style="color:#a6e3a1">&#xe0b0;</span>
-</pre>
+```
+ user ❯ ~ ❯ vault:unlocked ❯
+```
 
 Cross-transfer using `--vault` flag or `-w <workspace>`:
 ```bash
