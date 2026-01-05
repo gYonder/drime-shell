@@ -352,8 +352,8 @@ type GetAvailableNameRequest struct {
 
 // GetAvailableNameResponse represents the response from /entry/getAvailableName
 type GetAvailableNameResponse struct {
-	Available string `json:"available"`
-	Status    string `json:"status"`
+	Name   string `json:"name"`
+	Status string `json:"status"`
 }
 
 // VaultMeta represents vault metadata for password verification

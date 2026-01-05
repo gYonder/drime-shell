@@ -2,12 +2,12 @@ package commands
 
 import (
 	"context"
-	"flag"
 	"fmt"
 
 	"github.com/mikael.mansson2/drime-shell/internal/api"
 	"github.com/mikael.mansson2/drime-shell/internal/session"
 	"github.com/mikael.mansson2/drime-shell/internal/ui"
+	"github.com/spf13/pflag"
 )
 
 func init() {
@@ -61,11 +61,9 @@ func track(ctx context.Context, s *session.Session, env *ExecutionEnv, args []st
 		}
 	}
 
-	flags := flag.NewFlagSet("track", flag.ContinueOnError)
-	showStats := flags.Bool("stats", false, "Show tracking statistics")
-	flags.BoolVar(showStats, "s", false, "Alias for --stats")
-	listTracked := flags.Bool("list", false, "List all tracked files")
-	flags.BoolVar(listTracked, "l", false, "Alias for --list")
+	flags := pflag.NewFlagSet("track", pflag.ContinueOnError)
+	showStats := flags.BoolP("stats", "s", false, "Show tracking statistics")
+	listTracked := flags.BoolP("list", "l", false, "List all tracked files")
 	off := flags.Bool("off", false, "Stop tracking")
 	flags.SetOutput(env.Stderr)
 

@@ -138,7 +138,7 @@ results, err := asyncMap(items, func(item T, idx int) (R, error) {
 
 The shell implements Unix-like utilities operating on remote files:
 
-- **Text**: `cat`, `head`, `tail`, `less`, `wc`, `echo`, `printf`
+- **Text**: `cat`, `head`, `tail`, `less`, `wc`, `grep`, `echo`, `printf`
 - **Processing**: `sort`, `uniq`, `diff` (downloads to memory)
 - **Metadata**: `stat`, `tree`, `find`, `du`
 - **Operations**: `cp`, `mv`, `rm`, `mkdir`, `touch`

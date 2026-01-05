@@ -1,6 +1,6 @@
 $ErrorActionPreference = "Stop"
 
-$Owner = "mikael.mansson2"
+$Owner = "mikael-mansson"
 $Repo = "drime-shell"
 $Binary = "drime.exe"
 $Format = "zip"

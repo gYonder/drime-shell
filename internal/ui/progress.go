@@ -22,7 +22,7 @@ type ProgressModel struct {
 	done     bool
 }
 
-func NewProgressNodel(taskName string, total int64, runTask func(*tea.Program) error) ProgressModel {
+func NewProgressModel(taskName string, total int64, runTask func(*tea.Program) error) ProgressModel {
 	p := progress.New(
 		progress.WithDefaultGradient(),
 		progress.WithWidth(40),
@@ -92,7 +92,7 @@ const (
 
 // Helper to run
 func RunTransfer(taskName string, size int64, action func(send func(curr, total int64)) error) error {
-	m := NewProgressNodel(taskName, size, nil)
+	m := NewProgressModel(taskName, size, nil)
 	p := tea.NewProgram(m)
 
 	// Start task in goroutine

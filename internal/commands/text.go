@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"regexp"
 	"sort"
 	"strings"
 
@@ -52,6 +53,12 @@ func init() {
 		Description: "Output the last part of files",
 		Usage:       "tail [-n lines] <file>\\ntail [-n lines] (reads from stdin when piped)\\n\\nOptions:\\n  -n N    Show last N lines (default: 10)\\n\\nExamples:\\n  tail file.txt         Show last 10 lines\\n  tail -n 20 log.txt    Show last 20 lines",
 		Run:         tailCmd,
+	})
+	Register(&Command{
+		Name:        "grep",
+		Description: "Print lines that match patterns",
+		Usage:       "grep [-ivnc] <pattern> [file]\\ngrep [-ivnc] <pattern> (reads from stdin when piped)\\n\\nOptions:\\n  -i    Ignore case distinctions\\n  -v    Select non-matching lines\\n  -n    Print line numbers\\n  -c    Print only a count of matching lines\\n\\nExamples:\\n  grep error log.txt           Find lines containing 'error'\\n  grep -i ERROR log.txt        Case-insensitive search\\n  grep -n TODO main.go         Show line numbers\\n  cat file.txt | grep pattern  Filter piped input",
+		Run:         grepCmd,
 	})
 }
 
@@ -404,6 +411,92 @@ func tailCmd(ctx context.Context, s *session.Session, env *ExecutionEnv, args []
 	for i := start; i < len(lines); i++ {
 		fmt.Fprintln(env.Stdout, lines[i])
 	}
+	return nil
+}
+
+func grepCmd(ctx context.Context, s *session.Session, env *ExecutionEnv, args []string) error {
+	fs := pflag.NewFlagSet("grep", pflag.ContinueOnError)
+	fs.SetOutput(env.Stderr)
+	ignoreCase := fs.BoolP("ignore-case", "i", false, "ignore case distinctions")
+	invertMatch := fs.BoolP("invert-match", "v", false, "select non-matching lines")
+	lineNumber := fs.BoolP("line-number", "n", false, "print line numbers")
+	countOnly := fs.BoolP("count", "c", false, "print only a count of matching lines")
+
+	if err := fs.Parse(args); err != nil {
+		return err
+	}
+
+	if fs.NArg() < 1 {
+		return fmt.Errorf("usage: grep <pattern> [file]")
+	}
+
+	pattern := fs.Arg(0)
+
+	// Compile regex with case-insensitivity if requested
+	if *ignoreCase {
+		pattern = "(?i)" + pattern
+	}
+	re, err := regexp.Compile(pattern)
+	if err != nil {
+		return fmt.Errorf("grep: invalid pattern: %v", err)
+	}
+
+	// Determine input source
+	var reader io.Reader
+
+	if fs.NArg() < 2 {
+		// No file argument - read from stdin
+		if isStdinTTY(env.Stdin) {
+			return fmt.Errorf("usage: grep <pattern> <file>\n       grep <pattern> (reads from stdin when piped)")
+		}
+		reader = env.Stdin
+	} else if fs.NArg() == 2 {
+		// Single file - download and search
+		path := fs.Arg(1)
+		content, err := readFileToString(ctx, s, env, path)
+		if err != nil {
+			return err
+		}
+		reader = strings.NewReader(content)
+	} else {
+		// Multiple files - not supported
+		return fmt.Errorf("grep: multiple files not supported\n       Hint: use 'cat file1 file2 | grep pattern' instead")
+	}
+
+	// Process line by line
+	scanner := bufio.NewScanner(reader)
+	lineNo := 0
+	matchCount := 0
+
+	for scanner.Scan() {
+		lineNo++
+		line := scanner.Text()
+		match := re.MatchString(line)
+
+		if *invertMatch {
+			match = !match
+		}
+
+		if match {
+			matchCount++
+			if !*countOnly {
+				if *lineNumber {
+					fmt.Fprintf(env.Stdout, "%d:%s\n", lineNo, line)
+				} else {
+					fmt.Fprintln(env.Stdout, line)
+				}
+			}
+		}
+	}
+
+	if err := scanner.Err(); err != nil {
+		return fmt.Errorf("grep: %v", err)
+	}
+
+	if *countOnly {
+		fmt.Fprintln(env.Stdout, matchCount)
+	}
+
 	return nil
 }
 

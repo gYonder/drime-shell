@@ -2,7 +2,6 @@ package commands
 
 import (
 	"context"
-	"flag"
 	"fmt"
 	"io"
 	"sort"
@@ -14,6 +13,7 @@ import (
 	"github.com/mikael.mansson2/drime-shell/internal/api"
 	"github.com/mikael.mansson2/drime-shell/internal/session"
 	"github.com/mikael.mansson2/drime-shell/internal/ui"
+	"github.com/spf13/pflag"
 )
 
 func init() {
@@ -70,7 +70,7 @@ func share(ctx context.Context, s *session.Session, env *ExecutionEnv, args []st
 }
 
 func shareInvite(ctx context.Context, s *session.Session, env *ExecutionEnv, args []string) error {
-	flags := flag.NewFlagSet("share invite", flag.ContinueOnError)
+	flags := pflag.NewFlagSet("share invite", pflag.ContinueOnError)
 	role := flags.String("role", "view", "Permission level: view, edit, download")
 	flags.SetOutput(env.Stderr)
 
@@ -121,15 +121,11 @@ func shareInvite(ctx context.Context, s *session.Session, env *ExecutionEnv, arg
 }
 
 func shareLink(ctx context.Context, s *session.Session, env *ExecutionEnv, args []string) error {
-	flags := flag.NewFlagSet("share link", flag.ContinueOnError)
-	deleteLink := flags.Bool("delete", false, "Delete the shareable link")
-	flags.BoolVar(deleteLink, "d", false, "Alias for --delete")
-	password := flags.String("password", "", "Set a password")
-	flags.StringVar(password, "p", "", "Alias for --password")
-	expire := flags.String("expire", "", "Set expiration (e.g. 24h, 30m)")
-	flags.StringVar(expire, "e", "", "Alias for --expire")
-	role := flags.String("role", "download", "Permission level: view, edit, download")
-	flags.StringVar(role, "r", "download", "Alias for --role")
+	flags := pflag.NewFlagSet("share link", pflag.ContinueOnError)
+	deleteLink := flags.BoolP("delete", "d", false, "Delete the shareable link")
+	password := flags.StringP("password", "p", "", "Set a password")
+	expire := flags.StringP("expire", "e", "", "Set expiration (e.g. 24h, 30m)")
+	role := flags.StringP("role", "r", "download", "Permission level: view, edit, download")
 	copyLink := flags.Bool("copy", true, "Copy link to clipboard")
 	flags.SetOutput(env.Stderr)
 
@@ -283,7 +279,7 @@ func printLinkDetails(w io.Writer, link *api.ShareableLink) {
 }
 
 func shareList(ctx context.Context, s *session.Session, env *ExecutionEnv, args []string) error {
-	flags := flag.NewFlagSet("share ls", flag.ContinueOnError)
+	flags := pflag.NewFlagSet("share ls", pflag.ContinueOnError)
 	byMe := flags.Bool("by-me", false, "List files shared by me")
 	withMe := flags.Bool("with-me", false, "List files shared with me")
 	public := flags.Bool("public", false, "List files with public links")

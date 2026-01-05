@@ -119,6 +119,7 @@ Use `<command> -h` for detailed help on any command.
 | `cat` | Display file contents |
 | `head` / `tail` | Show first/last lines |
 | `wc` | Count lines/words/bytes |
+| `grep` | Search for patterns (`-i` case-insensitive, `-n` line numbers) |
 | `diff` | Compare two files |
 | `sort` / `uniq` | Sort lines, filter duplicates |
 | `edit` | Edit file in built-in editor |

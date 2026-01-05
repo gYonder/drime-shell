@@ -2287,7 +2287,7 @@ paths:
     post:
       tags:
         - Files and Folders
-      summary: Movie specified entries to a different folder
+      summary: Move specified entries to a different folder
       operationId: entriesMove
       parameters:
         - $ref: '#/components/parameters/WorkspaceId'

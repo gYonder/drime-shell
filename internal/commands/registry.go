@@ -2,7 +2,6 @@ package commands
 
 import (
 	"context"
-	"flag"
 	"fmt"
 	"io"
 	"sort"
@@ -10,6 +9,7 @@ import (
 
 	"github.com/mikael.mansson2/drime-shell/internal/session"
 	"github.com/mikael.mansson2/drime-shell/internal/ui"
+	"github.com/spf13/pflag"
 )
 
 type ExecutionEnv struct {
@@ -30,7 +30,7 @@ var Registry = make(map[string]*Command)
 // ReorderArgsForFlags reorders arguments so flags come before positional args.
 // This allows Unix-style interspersed flags like "cmd file.txt -f" to work
 // the same as "cmd -f file.txt".
-func ReorderArgsForFlags(fs *flag.FlagSet, args []string) []string {
+func ReorderArgsForFlags(fs *pflag.FlagSet, args []string) []string {
 	var flags []string
 	var positional []string
 
@@ -56,7 +56,7 @@ func ReorderArgsForFlags(fs *flag.FlagSet, args []string) []string {
 			f := fs.Lookup(name)
 			if f != nil {
 				// Check if it's a bool flag (doesn't need value)
-				if bf, ok := f.Value.(interface{ IsBoolFlag() bool }); ok && bf.IsBoolFlag() {
+				if f.Value.Type() == "bool" {
 					i++
 					continue
 				}

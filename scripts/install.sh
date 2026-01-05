@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-OWNER="mikael.mansson2"
+OWNER="mikael-mansson"
 REPO="drime-shell"
 BINARY="drime"
 FORMAT="tar.gz"

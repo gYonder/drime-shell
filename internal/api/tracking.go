@@ -9,14 +9,17 @@ import (
 // GetTrackedFiles returns the list of files currently being tracked
 func (c *HTTPClient) GetTrackedFiles(ctx context.Context) ([]TrackedFile, error) {
 	var result struct {
-		TrackedFiles []TrackedFile `json:"trackedFiles"`
+		Status     string `json:"status"`
+		Pagination struct {
+			Data []TrackedFile `json:"data"`
+		} `json:"pagination"`
 	}
 	// Note: The endpoint is /track/all
 	err := c.doJSON(ctx, http.MethodGet, "/track/all", nil, nil, &result, true)
 	if err != nil {
 		return nil, err
 	}
-	return result.TrackedFiles, nil
+	return result.Pagination.Data, nil
 }
 
 // GetTrackingStats returns detailed tracking statistics for a file

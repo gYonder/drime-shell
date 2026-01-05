@@ -78,7 +78,7 @@ func TestCheckCollisionsAndResolveWithPolicy_Rename(t *testing.T) {
 		},
 		GetAvailableNameFunc: func(ctx context.Context, req api.GetAvailableNameRequest) (*api.GetAvailableNameResponse, error) {
 			return &api.GetAvailableNameResponse{
-				Available: "file1 (1).txt",
+				Name: "file1 (1).txt",
 			}, nil
 		},
 	}

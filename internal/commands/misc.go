@@ -425,6 +425,11 @@ func addFolderToZip(ctx context.Context, s *session.Session, zw *zip.Writer, ent
 
 	// Copy all entries from the downloaded zip, prefixing with folder name
 	for _, f := range zipReader.File {
+		// Check for ZipSlip vulnerability - reject paths with traversal
+		if strings.Contains(f.Name, "..") {
+			return fmt.Errorf("illegal file path in zip: %s", f.Name)
+		}
+
 		newName := filepath.Join(folderName, f.Name)
 		fmt.Fprintf(env.Stdout, "  adding: %s\n", newName)
 

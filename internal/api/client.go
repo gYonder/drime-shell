@@ -395,7 +395,7 @@ func (m *MockDrimeClient) GetAvailableName(ctx context.Context, req GetAvailable
 	if m.GetAvailableNameFunc != nil {
 		return m.GetAvailableNameFunc(ctx, req)
 	}
-	return &GetAvailableNameResponse{Status: "success", Available: req.Name + " (1)"}, nil
+	return &GetAvailableNameResponse{Status: "success", Name: req.Name + " (1)"}, nil
 }
 
 // Vault mock implementations

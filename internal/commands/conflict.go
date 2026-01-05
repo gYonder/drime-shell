@@ -53,7 +53,7 @@ func ResolveConflict(ctx context.Context, client api.DrimeClient, workspaceID in
 		if err != nil {
 			return "", false, fmt.Errorf("failed to get available name: %w", err)
 		}
-		return resp.Available, true, nil
+		return resp.Name, true, nil
 	default:
 		return "", false, fmt.Errorf("unknown choice")
 	}
@@ -213,7 +213,7 @@ func checkCollisionsAndResolveWithPolicy(ctx context.Context, client api.DrimeCl
 				if err != nil {
 					return nil, fmt.Errorf("failed to get available name for %s: %w", name, err)
 				}
-				newName = availResp.Available
+				newName = availResp.Name
 				proceed = true
 			default: // "ask"
 				var err error
