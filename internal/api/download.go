@@ -97,7 +97,6 @@ func (c *HTTPClient) DownloadWithOptions(ctx context.Context, hash string, w io.
 	return &entry, nil
 }
 
-// CheckResumeSupport checks if the server supports Range requests for a given file
 func (c *HTTPClient) CheckResumeSupport(ctx context.Context, hash string) (bool, int64, error) {
 	url := fmt.Sprintf("%s/file-entries/download/%s", c.BaseURL, hash)
 
@@ -115,6 +114,12 @@ func (c *HTTPClient) CheckResumeSupport(ctx context.Context, hash string) (bool,
 
 	supportsRange := resp.Header.Get("Accept-Ranges") == "bytes"
 	contentLength := resp.ContentLength
+
+	if contentLength <= 0 {
+		if cl := resp.Header.Get("Content-Length"); cl != "" {
+			fmt.Sscanf(cl, "%d", &contentLength)
+		}
+	}
 
 	return supportsRange, contentLength, nil
 }
