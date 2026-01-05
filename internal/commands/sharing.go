@@ -42,7 +42,7 @@ Link Options:
 Info: Running 'share <file>' on a file that already has a link will display it.
 
 Invite Options:
-  --role            Permission level: view, edit, download (default: view)
+  --role            Permission level: view, edit, download (default: download)
 
 Examples:
   share ls --with-me              List files shared with me

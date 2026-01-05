@@ -86,7 +86,7 @@ adsff
 ```
 
 > [!TIP]
-> The actual shell features colorized output with the Catppuccin theme — folders in blue, archives in purple, images in yellow, and code files in green.
+> The actual shell features colorized output with the Catppuccin theme — folders in blue, archives in peach, images in yellow, and code files in green.
 
 ## Commands
 

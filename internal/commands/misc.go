@@ -17,12 +17,6 @@ import (
 
 func init() {
 	Register(&Command{
-		Name:        "whoami",
-		Description: "Show current user info",
-		Usage:       "whoami\\n\\nDisplays current user's name, email, and ID.",
-		Run:         whoami,
-	})
-	Register(&Command{
 		Name:        "du",
 		Description: "Show usage statistics",
 		Usage:       "du\\n\\nDisplays disk usage: used space, available space, and percentage.",
@@ -40,17 +34,6 @@ func init() {
 		Usage:       "zip <archive.zip> <file|folder>...\\n\\nCreates a ZIP archive from remote files/folders.\\nThe archive is uploaded to Drime Cloud.\\n\\nExamples:\\n  zip backup.zip file1.txt file2.txt\\n  zip photos.zip /Photos/vacation/\\n  zip all.zip /                      Zip entire storage",
 		Run:         zipCmd,
 	})
-}
-
-func whoami(ctx context.Context, s *session.Session, env *ExecutionEnv, args []string) error {
-	user, err := s.Client.Whoami(ctx)
-	if err != nil {
-		return err
-	}
-	fmt.Fprintf(env.Stdout, "User:  %s\n", user.Name())
-	fmt.Fprintf(env.Stdout, "Email: %s\n", user.Email)
-	fmt.Fprintf(env.Stdout, "ID:    %d\n", user.ID)
-	return nil
 }
 
 func du(ctx context.Context, s *session.Session, env *ExecutionEnv, args []string) error {

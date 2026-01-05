@@ -160,16 +160,50 @@ type FileRequestPayload struct {
 	Description string `json:"description"`
 }
 
-// ShareableLinkRequest represents the payload for creating/updating a link
-// Note: Uses camelCase to match Laravel API expectations
+// LinkRestrictions defines access restrictions for a shareable link
+type LinkRestrictions struct {
+	Emails    []string `json:"emails,omitempty"`
+	Domains   []string `json:"domains,omitempty"`
+	Countries []string `json:"countries,omitempty"`
+	Password  string   `json:"password,omitempty"`
+}
+
+// ShareableLinkRequest is the request body for creating/updating a shareable link
 type ShareableLinkRequest struct {
 	Request            *FileRequestPayload `json:"request,omitempty"`
 	Password           *string             `json:"password,omitempty"`
 	ExpiresAt          *string             `json:"expiresAt"` // ISO 8601 string, explicit null if nil
 	AllowEdit          bool                `json:"allowEdit"`
 	AllowDownload      bool                `json:"allowDownload"`
-	PersonalLink       bool                `json:"personalLink"`                 // Explicit true/false
-	PersonnalLinkValue string              `json:"personnalLinkValue,omitempty"` // Note: API typo "personnal"
+	Active             bool                `json:"active"`
+	Restrictions       *LinkRestrictions   `json:"restrictions,omitempty"`
+	GenerateNewHash    bool                `json:"generateNewHash"`
+	TurnstileToken     string              `json:"turnstileToken,omitempty"`
+	DisableWatermark   bool                `json:"disableWatermark"`
+	HideViewerDownload bool                `json:"hideViewerDownload"`
+	Title              string              `json:"title,omitempty"`
+	Description        string              `json:"description,omitempty"`
+	ShowSocialButtons  bool                `json:"showSocialButtons"`
+	ShowAvatar         bool                `json:"showAvatar"`
+	ShowFileName       bool                `json:"showFileName"`
+	ShowFileSize       bool                `json:"showFileSize"`
+	ShowFileCount      bool                `json:"showFileCount"`
+	ShowBreadcrumbs    bool                `json:"showBreadcrumbs"`
+	CustomDomainId     int                 `json:"customDomainId,omitempty"`
+	Layout             string              `json:"layout,omitempty"`
+	Theme              string              `json:"theme,omitempty"`
+	CustomCSS          string              `json:"customCSS,omitempty"`
+	GoogleAnalyticsId  string              `json:"gaId,omitempty"`
+	FacebookPixelId    string              `json:"fbPixelId,omitempty"`
+	BaiduAnalyticsId   string              `json:"baId,omitempty"`
+	YandexMetrikaId    string              `json:"yandexId,omitempty"`
+	AdSenseSlotId      string              `json:"adSlotId,omitempty"`
+	AdSenseClientId    string              `json:"adClientId,omitempty"`
+	AdScript           string              `json:"adScript,omitempty"`
+	CustomHTML         string              `json:"customHTML,omitempty"`
+	Meta               *map[string]string  `json:"meta,omitempty"`
+	PersonalLink       bool                `json:"perso,omitempty"`                // true if personalized link
+	PersonnalLinkValue string              `json:"personnal_link_value,omitempty"` // Custom link suffix
 }
 
 // FileRequest represents a file request entry

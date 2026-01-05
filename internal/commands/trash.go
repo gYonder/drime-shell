@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"context"
 	"fmt"
-	"os"
 	"sort"
 	"strconv"
 	"strings"
@@ -193,7 +192,7 @@ func trashEmpty(ctx context.Context, s *session.Session, env *ExecutionEnv) erro
 	fmt.Fprint(env.Stdout, ui.WarningStyle.Render("⚠ This will permanently delete all items in trash. This cannot be undone.\n"))
 	fmt.Fprint(env.Stdout, "Type 'yes' to confirm: ")
 
-	reader := bufio.NewReader(os.Stdin)
+	reader := bufio.NewReader(env.Stdin)
 	response, err := reader.ReadString('\n')
 	if err != nil {
 		return err

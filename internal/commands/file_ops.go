@@ -3,7 +3,6 @@ package commands
 import (
 	"bytes"
 	"context"
-	"flag"
 	"fmt"
 	"path/filepath"
 	"strings"
@@ -12,6 +11,7 @@ import (
 	"github.com/mikael.mansson2/drime-shell/internal/crypto"
 	"github.com/mikael.mansson2/drime-shell/internal/session"
 	"github.com/mikael.mansson2/drime-shell/internal/ui"
+	"github.com/spf13/pflag"
 )
 
 func init() {
@@ -37,10 +37,9 @@ func init() {
 
 func mv(ctx context.Context, s *session.Session, env *ExecutionEnv, args []string) error {
 	// Parse flags
-	flags := flag.NewFlagSet("mv", flag.ContinueOnError)
-	targetWorkspaceStr := flags.String("w", "", "Target workspace (name or ID)")
-	toVault := flags.Bool("vault", false, "Move to vault (when in workspace) or from vault to workspace (when in vault with -w)")
-	flags.BoolVar(toVault, "V", false, "Alias for --vault")
+	flags := pflag.NewFlagSet("mv", pflag.ContinueOnError)
+	targetWorkspaceStr := flags.StringP("workspace", "w", "", "Target workspace (name or ID)")
+	toVault := flags.BoolP("vault", "V", false, "Move to vault (when in workspace) or from vault to workspace (when in vault with -w)")
 	flags.SetOutput(env.Stderr)
 	if err := flags.Parse(args); err != nil {
 		return err
@@ -325,11 +324,10 @@ func moveEntries(ctx context.Context, s *session.Session, sources []string, dest
 }
 
 func cp(ctx context.Context, s *session.Session, env *ExecutionEnv, args []string) error {
-	flags := flag.NewFlagSet("cp", flag.ContinueOnError)
-	recursive := flags.Bool("r", false, "Copy directories recursively")
-	targetWorkspaceStr := flags.String("w", "", "Target workspace (name or ID)")
-	toVault := flags.Bool("vault", false, "Copy to vault (when in workspace)")
-	flags.BoolVar(toVault, "V", false, "Alias for --vault")
+	flags := pflag.NewFlagSet("cp", pflag.ContinueOnError)
+	recursive := flags.BoolP("recursive", "r", false, "Copy directories recursively")
+	targetWorkspaceStr := flags.StringP("workspace", "w", "", "Target workspace (name or ID)")
+	toVault := flags.BoolP("vault", "V", false, "Copy to vault (when in workspace)")
 	flags.SetOutput(env.Stderr)
 	if err := flags.Parse(args); err != nil {
 		return err

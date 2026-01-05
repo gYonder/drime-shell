@@ -58,6 +58,8 @@ Displays information about the currently logged-in user:
 }
 
 func loginCmd(ctx context.Context, s *session.Session, env *ExecutionEnv, args []string) error {
+	// Note: Login must use os.Stdin directly since it's typically run before the REPL
+	// and needs actual terminal input for the password prompt
 	reader := bufio.NewReader(os.Stdin)
 
 	// Get email
