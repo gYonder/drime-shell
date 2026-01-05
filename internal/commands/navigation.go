@@ -112,7 +112,7 @@ type listPathOptions struct {
 func listPathWithOpts(ctx context.Context, s *session.Session, path string, opts *listPathOptions, w io.Writer) error {
 	resolved, err := s.ResolvePathArg(path)
 	if err != nil {
-		return fmt.Errorf("ls: %v", err)
+		return fmt.Errorf("ls: %w", err)
 	}
 
 	// Check if path exists in cache

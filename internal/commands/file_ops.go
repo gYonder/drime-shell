@@ -56,7 +56,7 @@ func mv(ctx context.Context, s *session.Session, env *ExecutionEnv, args []strin
 	if *targetWorkspaceStr != "" {
 		wsID, _, err := ResolveWorkspace(ctx, s, *targetWorkspaceStr)
 		if err != nil {
-			return fmt.Errorf("mv: %v", err)
+			return fmt.Errorf("mv: %w", err)
 		}
 		targetWorkspaceID = &wsID
 	}
@@ -133,7 +133,7 @@ func mv(ctx context.Context, s *session.Session, env *ExecutionEnv, args []strin
 			var err error
 			destResolved, err = s.ResolvePathArg(dest)
 			if err != nil {
-				return fmt.Errorf("mv: %v", err)
+				return fmt.Errorf("mv: %w", err)
 			}
 			destEntry, destExists = s.Cache.Get(destResolved)
 		}
@@ -144,7 +144,7 @@ func mv(ctx context.Context, s *session.Session, env *ExecutionEnv, args []strin
 			src := sources[0]
 			srcResolved, err := s.ResolvePathArg(src)
 			if err != nil {
-				return fmt.Errorf("mv: %v", err)
+				return fmt.Errorf("mv: %w", err)
 			}
 			srcEntry, ok := s.Cache.Get(srcResolved)
 			if !ok {
@@ -237,7 +237,7 @@ func moveEntries(ctx context.Context, s *session.Session, sources []string, dest
 	for _, src := range sources {
 		resolved, err := s.ResolvePathArg(src)
 		if err != nil {
-			return fmt.Errorf("mv: %v", err)
+			return fmt.Errorf("mv: %w", err)
 		}
 		entry, ok := s.Cache.Get(resolved)
 		if !ok {
@@ -345,7 +345,7 @@ func cp(ctx context.Context, s *session.Session, env *ExecutionEnv, args []strin
 	if *targetWorkspaceStr != "" {
 		wsID, _, err := ResolveWorkspace(ctx, s, *targetWorkspaceStr)
 		if err != nil {
-			return fmt.Errorf("cp: %v", err)
+			return fmt.Errorf("cp: %w", err)
 		}
 		targetWorkspaceID = &wsID
 	}
@@ -410,7 +410,7 @@ func cp(ctx context.Context, s *session.Session, env *ExecutionEnv, args []strin
 			var err error
 			destResolved, err = s.ResolvePathArg(dest)
 			if err != nil {
-				return fmt.Errorf("cp: %v", err)
+				return fmt.Errorf("cp: %w", err)
 			}
 			destEntry, destExists = s.Cache.Get(destResolved)
 		}
@@ -420,7 +420,7 @@ func cp(ctx context.Context, s *session.Session, env *ExecutionEnv, args []strin
 			src := sources[0]
 			srcResolved, err := s.ResolvePathArg(src)
 			if err != nil {
-				return fmt.Errorf("cp: %v", err)
+				return fmt.Errorf("cp: %w", err)
 			}
 			srcEntry, ok := s.Cache.Get(srcResolved)
 			if !ok {
@@ -510,7 +510,7 @@ func copyIntoFolder(ctx context.Context, s *session.Session, sources []string, d
 		for _, src := range sources {
 			resolved, err := s.ResolvePathArg(src)
 			if err != nil {
-				return fmt.Errorf("cp: %v", err)
+				return fmt.Errorf("cp: %w", err)
 			}
 			entry, ok := s.Cache.Get(resolved)
 			if !ok {
@@ -535,7 +535,7 @@ func copyIntoFolder(ctx context.Context, s *session.Session, sources []string, d
 	for _, src := range sources {
 		resolved, err := s.ResolvePathArg(src)
 		if err != nil {
-			return fmt.Errorf("cp: %v", err)
+			return fmt.Errorf("cp: %w", err)
 		}
 		entry, ok := s.Cache.Get(resolved)
 		if !ok {
@@ -634,7 +634,7 @@ func touch(ctx context.Context, s *session.Session, env *ExecutionEnv, args []st
 		for _, arg := range args {
 			resolved, err := s.ResolvePathArg(arg)
 			if err != nil {
-				return fmt.Errorf("touch: %v", err)
+				return fmt.Errorf("touch: %w", err)
 			}
 
 			// Get parent directory
@@ -799,7 +799,7 @@ func copyToVault(ctx context.Context, s *session.Session, env *ExecutionEnv, sou
 	for _, src := range sources {
 		srcResolved, err := s.ResolvePathArg(src)
 		if err != nil {
-			return fmt.Errorf("cp: %v", err)
+			return fmt.Errorf("cp: %w", err)
 		}
 
 		srcEntry, ok := savedCache.Get(srcResolved)

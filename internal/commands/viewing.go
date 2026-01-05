@@ -25,7 +25,7 @@ func cat(ctx context.Context, s *session.Session, env *ExecutionEnv, args []stri
 	for _, path := range args {
 		entry, err := ResolveEntry(ctx, s, path)
 		if err != nil {
-			return fmt.Errorf("cat: %v", err)
+			return fmt.Errorf("cat: %w", err)
 		}
 
 		if entry.Type == "folder" {

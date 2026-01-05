@@ -54,7 +54,7 @@ func mkdirOne(ctx context.Context, s *session.Session, env *ExecutionEnv, path s
 	// Resolve to absolute path
 	targetPath, err := s.ResolvePathArg(path)
 	if err != nil {
-		return fmt.Errorf("mkdir: %v", err)
+		return fmt.Errorf("mkdir: %w", err)
 	}
 
 	// Check if already exists
@@ -212,7 +212,7 @@ func rm(ctx context.Context, s *session.Session, env *ExecutionEnv, args []strin
 				// Glob expansion
 				resolvedPattern, err := s.ResolvePathArg(pattern)
 				if err != nil {
-					return fmt.Errorf("rm: %v", err)
+					return fmt.Errorf("rm: %w", err)
 				}
 				parentDir := filepath.Dir(resolvedPattern)
 				filePattern := filepath.Base(pattern)
@@ -259,7 +259,7 @@ func rm(ctx context.Context, s *session.Session, env *ExecutionEnv, args []strin
 			// Regular path (no glob)
 			resolved, err := s.ResolvePathArg(pattern)
 			if err != nil {
-				return fmt.Errorf("rm: %v", err)
+				return fmt.Errorf("rm: %w", err)
 			}
 			entry, ok := s.Cache.Get(resolved)
 			if !ok {

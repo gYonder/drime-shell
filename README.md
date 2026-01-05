@@ -54,33 +54,33 @@ drime
 The shell uses a Powerline-style prompt showing your username and current path:
 
 ```
- user  ~/Projects  
+ mikael.maansson  ~/Projects  
 ```
 
 When in a workspace or vault, additional context is shown:
 
 ```
- user  ~/Documents   MyWorkspace  
- user  ~/Private   vault:unlocked  
+ mikael.maansson  ~/Documents   MyWorkspace  
+ mikael.maansson  ~/Private   vault:unlocked  
 ```
 
 ### Example Session
 
 ```
- user  ~  ls
-Documents/  Photos/  Projects/  notes.md
+ mikael.maansson  ~  ls
+222704736.pdf.zip                           ex.txt
+6089912.pdf                                 ex.txt - Copy
+Bildsamling                                 foo
+Firefox 144.0.2.dmg                         foobar
+IMG_50291.jpg                               rename.ts
+README.md                                   temp
+Tipsruta till Tomtepromenaden 2025.pdf      test.zip
+UploadFromMobile                            xxx
 
- user  ~  cd Projects
+ mikael.maansson  ~  cat README.md | head -5
+# Drime Shell
 
- user  ~/Projects  ls -l
-total 12.5 KB
-  4.0 KB  alice   Dec 12 14:22  my-app/
-  2.1 KB  alice   Dec 14 10:30  notes.md   *
-  6.4 KB  alice   Dec 10 09:15  config.yaml
-
- user  ~/Projects  cat notes.md | head -5
-# Project Notes
-...
+A modern CLI shell for Drime Cloud built in Go...
 ```
 
 ## Commands
@@ -158,7 +158,7 @@ Zero-knowledge encrypted storage with client-side AES-256-GCM encryption.
 
 When in vault, the prompt shows status:
 ```
- user  ~/Private   vault:unlocked  
+ mikael.maansson  ~/Private   vault:unlocked  
 ```
 
 Cross-transfer using `--vault` flag or `-w <workspace>`:

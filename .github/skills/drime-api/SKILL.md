@@ -157,11 +157,39 @@ GET /track/infos/{id}                   → Get tracking stats
 
 ## Error Handling
 
-- `401 Unauthorized` → Token expired, prompt re-login
-- `403 Forbidden` → Permission denied
-- `404 Not Found` → Entry doesn't exist or no access
-- `429 Too Many Requests` → Check `Retry-After` header
-- `500+ Server Error` → Retry with backoff
+### Error Response Codes
+
+| Code | Meaning | Client Action |
+|------|---------|---------------|
+| `401 Unauthorized` | Token expired or invalid | Prompt re-login, clear stored token |
+| `403 Forbidden` | Permission denied | Check workspace membership, entry permissions |
+| `404 Not Found` | Entry doesn't exist or no access | Verify path, check cache staleness |
+| `429 Too Many Requests` | Rate limited | Read `Retry-After` header, back off |
+| `500+ Server Error` | Backend issue | Retry with exponential backoff |
+
+### Client-Side Error Handling
+
+```go
+// Check for token expiration
+if errors.Is(err, api.ErrTokenExpired) {
+    return fmt.Errorf("session expired, please run: login")
+}
+
+// Retry transient failures
+func withRetry(fn func() error) error {
+    for i := 0; i < 3; i++ {
+        if err := fn(); err != nil {
+            if isTransient(err) {
+                time.Sleep(time.Duration(i+1) * time.Second)
+                continue
+            }
+            return err
+        }
+        return nil
+    }
+    return fmt.Errorf("max retries exceeded")
+}
+```
 
 ## Reference
 

@@ -65,7 +65,7 @@ func wsCmd(ctx context.Context, s *session.Session, env *ExecutionEnv, args []st
 		if len(args) > 1 {
 			wsID, _, err := ResolveWorkspace(ctx, s, args[1])
 			if err != nil {
-				return fmt.Errorf("ws rm: %v", err)
+				return fmt.Errorf("ws rm: %w", err)
 			}
 			targetID = wsID
 		}

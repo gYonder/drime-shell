@@ -166,7 +166,7 @@ var requestCreateCommand = &Command{
 			// Parse date
 			t, err := time.Parse("2006-01-02", expires)
 			if err != nil {
-				return fmt.Errorf("invalid date format (use YYYY-MM-DD): %v", err)
+				return fmt.Errorf("invalid date format (use YYYY-MM-DD): %w", err)
 			}
 			// Set to end of day
 			t = time.Date(t.Year(), t.Month(), t.Day(), 23, 59, 59, 0, t.Location())
@@ -194,7 +194,7 @@ var requestCreateCommand = &Command{
 
 			updatedLink, err := s.Client.UpdateShareableLink(ctx, entry.ID, updateReq)
 			if err != nil {
-				return fmt.Errorf("request created but failed to update settings: %v", err)
+				return fmt.Errorf("request created but failed to update settings: %w", err)
 			}
 			link = updatedLink
 		}

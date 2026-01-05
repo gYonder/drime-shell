@@ -20,6 +20,7 @@ import (
 
 // setupTestSession creates a test session with mock client and pre-populated cache
 func setupTestSession(t *testing.T) (*session.Session, *api.MockDrimeClient) {
+	t.Helper()
 	cache := api.NewFileCache()
 	mockClient := &api.MockDrimeClient{
 		ListByParentIDFunc: func(ctx context.Context, parentID *int64) ([]api.FileEntry, error) {

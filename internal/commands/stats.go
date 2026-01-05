@@ -56,7 +56,7 @@ func stat(ctx context.Context, s *session.Session, env *ExecutionEnv, args []str
 	path := args[0]
 	cached, err := ResolveEntry(ctx, s, path)
 	if err != nil {
-		return fmt.Errorf("stat: %v", err)
+		return fmt.Errorf("stat: %w", err)
 	}
 
 	// Fetch fresh details from API (with spinner for slow requests)
@@ -100,7 +100,7 @@ func tree(ctx context.Context, s *session.Session, env *ExecutionEnv, args []str
 
 	resolved, err := s.ResolvePathArg(rootPath)
 	if err != nil {
-		return fmt.Errorf("tree: %v", err)
+		return fmt.Errorf("tree: %w", err)
 	}
 	rootEntry, ok := s.Cache.Get(resolved)
 	if !ok {

@@ -115,6 +115,7 @@ func TestSearchCommand(t *testing.T) {
 }
 
 func decodeFilters(t *testing.T, encoded string) []api.Filter {
+	t.Helper()
 	if encoded == "" {
 		return nil
 	}

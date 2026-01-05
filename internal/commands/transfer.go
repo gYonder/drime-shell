@@ -104,7 +104,7 @@ func uploadFileWithPolicy(ctx context.Context, s *session.Session, env *Executio
 	// Resolve destination
 	destResolved, err := s.ResolvePathArg(remotePath)
 	if err != nil {
-		return fmt.Errorf("upload: %v", err)
+		return fmt.Errorf("upload: %w", err)
 	}
 	var parentID *int64
 	destName := filepath.Base(localPath)
@@ -208,7 +208,7 @@ func uploadDirectory(ctx context.Context, s *session.Session, env *ExecutionEnv,
 	// Resolve the remote destination
 	destResolved, err := s.ResolvePathArg(remotePath)
 	if err != nil {
-		return fmt.Errorf("upload: %v", err)
+		return fmt.Errorf("upload: %w", err)
 	}
 	baseDirName := filepath.Base(localPath)
 
@@ -547,7 +547,7 @@ func download(ctx context.Context, s *session.Session, env *ExecutionEnv, args [
 	// Resolve remote path and find the entry
 	entry, err := ResolveEntry(ctx, s, remotePath)
 	if err != nil {
-		return fmt.Errorf("download: %v", err)
+		return fmt.Errorf("download: %w", err)
 	}
 
 	// Handle vault downloads separately (requires decryption)
@@ -671,7 +671,7 @@ func downloadFileAttemptResumable(ctx context.Context, s *session.Session, entry
 	}
 
 	if err != nil {
-		return fmt.Errorf("download: cannot open %s: %v", finalPath, err)
+		return fmt.Errorf("download: cannot open %s: %w", finalPath, err)
 	}
 	defer f.Close()
 
@@ -724,7 +724,7 @@ func downloadDirectory(ctx context.Context, s *session.Session, env *ExecutionEn
 	} else if os.IsNotExist(err) {
 		// Create the directory
 		if err := os.MkdirAll(localPath, 0755); err != nil {
-			return fmt.Errorf("download: cannot create directory %s: %v", localPath, err)
+			return fmt.Errorf("download: cannot create directory %s: %w", localPath, err)
 		}
 	} else {
 		return fmt.Errorf("download: %s exists and is not a directory", localPath)
@@ -734,7 +734,7 @@ func downloadDirectory(ctx context.Context, s *session.Session, env *ExecutionEn
 	// Create temp file for zip
 	tmpFile, err := os.CreateTemp("", "drime-download-*.zip")
 	if err != nil {
-		return fmt.Errorf("download: cannot create temp file: %v", err)
+		return fmt.Errorf("download: cannot create temp file: %w", err)
 	}
 	tmpPath := tmpFile.Name()
 	defer os.Remove(tmpPath)
@@ -749,13 +749,13 @@ func downloadDirectory(ctx context.Context, s *session.Session, env *ExecutionEn
 	})
 
 	if err != nil {
-		return fmt.Errorf("download: failed to download: %v", err)
+		return fmt.Errorf("download: failed to download: %w", err)
 	}
 
 	// Extract zip
 	fmt.Fprintf(env.Stdout, "Extracting to %s...\n", extractDir)
 	if err := extractZip(tmpPath, extractDir); err != nil {
-		return fmt.Errorf("download: failed to extract: %v", err)
+		return fmt.Errorf("download: failed to extract: %w", err)
 	}
 
 	fmt.Fprintf(env.Stdout, "Downloaded %s to %s\n", entry.Name, extractDir)
@@ -805,7 +805,7 @@ func edit(ctx context.Context, s *session.Session, env *ExecutionEnv, args []str
 	path := args[0]
 	resolved, err := s.ResolvePathArg(path)
 	if err != nil {
-		return fmt.Errorf("edit: %v", err)
+		return fmt.Errorf("edit: %w", err)
 	}
 	entry, ok := s.Cache.Get(resolved)
 	if !ok {
@@ -1018,7 +1018,7 @@ func uploadToVault(ctx context.Context, s *session.Session, env *ExecutionEnv, a
 	// Check if local path exists and what type it is
 	stat, err := os.Stat(localPath)
 	if err != nil {
-		return fmt.Errorf("upload: %s: %v", localPath, err)
+		return fmt.Errorf("upload: %s: %w", localPath, err)
 	}
 
 	if stat.IsDir() {

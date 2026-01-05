@@ -190,7 +190,7 @@ func shareLink(ctx context.Context, s *session.Session, env *ExecutionEnv, args 
 	if *expire != "" {
 		duration, err := time.ParseDuration(*expire)
 		if err != nil {
-			return fmt.Errorf("invalid duration: %v", err)
+			return fmt.Errorf("invalid duration: %w", err)
 		}
 		expTime := time.Now().Add(duration).Format(time.RFC3339)
 		req.ExpiresAt = &expTime

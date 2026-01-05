@@ -20,6 +20,7 @@ import (
 
 // setupTestEnv creates a test session and execution environment
 func setupTestEnv(t *testing.T) (*session.Session, *commands.ExecutionEnv, *bytes.Buffer) {
+	t.Helper()
 	cache := api.NewFileCache()
 	mockClient := &api.MockDrimeClient{
 		ListByParentIDFunc: func(ctx context.Context, parentID *int64) ([]api.FileEntry, error) {

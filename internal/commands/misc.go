@@ -78,7 +78,7 @@ func unzip(ctx context.Context, s *session.Session, env *ExecutionEnv, args []st
 	path := args[0]
 	resolved, err := s.ResolvePathArg(path)
 	if err != nil {
-		return fmt.Errorf("unzip: %v", err)
+		return fmt.Errorf("unzip: %w", err)
 	}
 	entry, ok := s.Cache.Get(resolved)
 	if !ok {
@@ -93,7 +93,7 @@ func unzip(ctx context.Context, s *session.Session, env *ExecutionEnv, args []st
 	parentDir := filepath.Dir(resolved)
 	parentEntry, _ := s.Cache.Get(parentDir)
 
-	err = ui.WithSpinnerErr(os.Stderr, "", false, func() error {
+	err = ui.WithSpinnerErr(env.Stderr, "", false, func() error {
 		// Extract the archive
 		if err := s.Client.ExtractEntry(ctx, entry.ID, entry.ParentID, s.WorkspaceID); err != nil {
 			return err
@@ -161,7 +161,7 @@ func zipCmd(ctx context.Context, s *session.Session, env *ExecutionEnv, args []s
 	// Resolve destination path
 	destResolved, err := s.ResolvePathArg(archiveName)
 	if err != nil {
-		return fmt.Errorf("zip: %v", err)
+		return fmt.Errorf("zip: %w", err)
 	}
 	destDir := filepath.Dir(destResolved)
 
@@ -189,7 +189,7 @@ func zipCmd(ctx context.Context, s *session.Session, env *ExecutionEnv, args []s
 	for _, src := range sources {
 		resolved, err := s.ResolvePathArg(src)
 		if err != nil {
-			return fmt.Errorf("zip: %v", err)
+			return fmt.Errorf("zip: %w", err)
 		}
 		entry, ok := s.Cache.Get(resolved)
 		if !ok {
@@ -224,7 +224,7 @@ func zipCmd(ctx context.Context, s *session.Session, env *ExecutionEnv, args []s
 		var err error
 		tempFile, err = os.CreateTemp("", "drime-zip-*.zip")
 		if err != nil {
-			return fmt.Errorf("zip: failed to create temp file: %v", err)
+			return fmt.Errorf("zip: failed to create temp file: %w", err)
 		}
 		defer func() {
 			tempFile.Close()
@@ -241,18 +241,18 @@ func zipCmd(ctx context.Context, s *session.Session, env *ExecutionEnv, args []s
 		if src.entry.Type == "folder" {
 			if err := addFolderToZip(ctx, s, zipWriter, src.entry, src.baseName, env, maxMemory); err != nil {
 				zipWriter.Close()
-				return fmt.Errorf("zip: error adding folder %s: %v", src.baseName, err)
+				return fmt.Errorf("zip: error adding folder %s: %w", src.baseName, err)
 			}
 		} else {
 			if err := addFileToZip(ctx, s, zipWriter, src.entry, src.baseName, env, maxMemory); err != nil {
 				zipWriter.Close()
-				return fmt.Errorf("zip: error adding file %s: %v", src.baseName, err)
+				return fmt.Errorf("zip: error adding file %s: %w", src.baseName, err)
 			}
 		}
 	}
 
 	if err := zipWriter.Close(); err != nil {
-		return fmt.Errorf("zip: error finalizing archive: %v", err)
+		return fmt.Errorf("zip: error finalizing archive: %w", err)
 	}
 
 	// Prepare upload source
@@ -277,7 +277,7 @@ func zipCmd(ctx context.Context, s *session.Session, env *ExecutionEnv, args []s
 	}
 
 	var uploadedEntry *api.FileEntry
-	err = ui.WithSpinnerErr(os.Stderr, "", false, func() error {
+	err = ui.WithSpinnerErr(env.Stderr, "", false, func() error {
 		var err error
 		uploadedEntry, err = s.Client.Upload(ctx, uploadReader, filepath.Base(destResolved), parentID, uploadSize, s.WorkspaceID)
 		return err
@@ -333,7 +333,7 @@ func addLargeFileToZip(ctx context.Context, s *session.Session, zw *zip.Writer, 
 	// Create temp file for download
 	tempFile, err := os.CreateTemp("", "drime-download-*")
 	if err != nil {
-		return fmt.Errorf("failed to create temp file: %v", err)
+		return fmt.Errorf("failed to create temp file: %w", err)
 	}
 	defer func() {
 		tempFile.Close()
@@ -385,7 +385,7 @@ func addFolderToZip(ctx context.Context, s *session.Session, zw *zip.Writer, ent
 		// Download to temp file
 		tempFile, err := os.CreateTemp("", "drime-folder-*.zip")
 		if err != nil {
-			return fmt.Errorf("failed to create temp file: %v", err)
+			return fmt.Errorf("failed to create temp file: %w", err)
 		}
 		defer func() {
 			tempFile.Close()
@@ -405,7 +405,7 @@ func addFolderToZip(ctx context.Context, s *session.Session, zw *zip.Writer, ent
 
 		zipReader, err = zip.NewReader(tempFile, size)
 		if err != nil {
-			return fmt.Errorf("failed to read folder zip: %v", err)
+			return fmt.Errorf("failed to read folder zip: %w", err)
 		}
 	} else {
 		// Download to memory
@@ -419,7 +419,7 @@ func addFolderToZip(ctx context.Context, s *session.Session, zw *zip.Writer, ent
 
 		zipReader, err = zip.NewReader(bytes.NewReader(content.Bytes()), int64(content.Len()))
 		if err != nil {
-			return fmt.Errorf("failed to read folder zip: %v", err)
+			return fmt.Errorf("failed to read folder zip: %w", err)
 		}
 	}
 
@@ -459,7 +459,7 @@ func addRootFolderToZip(ctx context.Context, s *session.Session, zw *zip.Writer,
 	apiOpts := api.ListOptions(s.WorkspaceID)
 	children, err := s.Client.ListByParentIDWithOptions(ctx, nil, apiOpts)
 	if err != nil {
-		return fmt.Errorf("failed to list root folder: %v", err)
+		return fmt.Errorf("failed to list root folder: %w", err)
 	}
 
 	for _, child := range children {

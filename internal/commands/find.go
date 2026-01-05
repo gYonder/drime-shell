@@ -60,7 +60,7 @@ func find(ctx context.Context, s *session.Session, env *ExecutionEnv, args []str
 		searchPath := fs.Arg(0)
 		resolvedPath, err := s.ResolvePathArg(searchPath)
 		if err != nil {
-			return fmt.Errorf("find: %v", err)
+			return fmt.Errorf("find: %w", err)
 		}
 		entry, ok := s.Cache.Get(resolvedPath)
 		if !ok {
@@ -129,7 +129,7 @@ func find(ctx context.Context, s *session.Session, env *ExecutionEnv, args []str
 		return s.Client.ListByParentIDWithOptions(ctx, nil, opts)
 	})
 	if err != nil {
-		return fmt.Errorf("find: %v", err)
+		return fmt.Errorf("find: %w", err)
 	}
 
 	// Client-side filtering for -type f (exclude folders)

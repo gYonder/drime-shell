@@ -19,6 +19,7 @@ import (
 
 // setupWorkspaceTestEnv creates a test session configured for workspace tests
 func setupWorkspaceTestEnv(t *testing.T) (*session.Session, *commands.ExecutionEnv, *bytes.Buffer, *bytes.Buffer) {
+	t.Helper()
 	cache := api.NewFileCache()
 	mockClient := &api.MockDrimeClient{
 		ListByParentIDFunc: func(ctx context.Context, parentID *int64) ([]api.FileEntry, error) {

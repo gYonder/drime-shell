@@ -28,6 +28,88 @@ This is a Go CLI shell application for Drime Cloud storage. It provides an SSH-l
 - Resolve paths using `s.ResolvePathArg(path)` before API calls
 - Cache invalidation after mutations: `s.Cache.Invalidate(path)` or `s.Cache.AddChildren()`
 
+## Command Implementation Pattern
+
+```go
+func init() {
+    Register(&Command{
+        Name:        "cmdname",
+        Description: "Short description",
+        Usage:       "cmdname [options] <args>\n\nDetailed usage...",
+        Run:         cmdname,
+    })
+}
+
+func cmdname(ctx context.Context, s *session.Session, env *ExecutionEnv, args []string) error {
+    fs := pflag.NewFlagSet("cmdname", pflag.ContinueOnError)
+    fs.SetOutput(env.Stderr)
+    // define flags
+    if err := fs.Parse(args); err != nil {
+        return err
+    }
+    // implementation
+    return nil
+}
+```
+
+## API Client Patterns
+
+```go
+// Always use context
+result, err := s.Client.SomeMethod(ctx, params)
+
+// Use WithSpinner for slow operations
+entries, err := ui.WithSpinner(env.Stdout, "Loading...", false, func() ([]api.FileEntry, error) {
+    return s.Client.ListByParentIDWithOptions(ctx, parentID, opts)
+})
+```
+
+### List Options Helpers
+
+Use helper functions for consistent API queries:
+
+```go
+// ListOptions creates options with defaults (orderBy: "name", asc)
+opts := api.ListOptions(s.WorkspaceID)
+
+// SearchOptions for search queries (orderBy: "updated_at", desc)
+opts := api.SearchOptions(s.WorkspaceID, "query")
+
+// Chainable filters
+opts := api.ListOptions(s.WorkspaceID).
+    WithDeletedOnly().     // Trash
+    WithStarredOnly().     // Starred
+    WithTrackedOnly().     // Send & Track
+    WithOrder("file_size", "desc")
+```
+
+## Cache Operations
+
+The cache maps paths to entries (IDs, hashes, metadata). Initialized at startup with folder tree.
+
+```go
+// Resolve path to entry
+entry, ok := s.Cache.Get(resolved)
+if !ok {
+    return fmt.Errorf("not found: %s", path)
+}
+
+// Update cache after mutations
+s.Cache.AddChildren(parentPath, newEntries)
+s.Cache.Invalidate(path)
+s.Cache.Remove(path)
+```
+
+## Worker Pool for Bulk Operations
+
+Use `asyncMap` for concurrent operations (uploads, deletes):
+
+```go
+results, err := asyncMap(items, func(item T, idx int) (R, error) {
+    // process item
+}, concurrencyLimit)
+```
+
 ## Error Handling
 
 - Return `fmt.Errorf("cmd: %v", err)` with command name prefix

@@ -20,6 +20,20 @@ Drime Shell uses the Charm ecosystem for all UI rendering.
 - Support both Dark and Light themes (Catppuccin Mocha/Latte).
 - Use semantic color names defined in `ui/colors.go` (e.g., `ColorPrimary`, `ColorError`).
 
+### Catppuccin Color Palette Reference
+
+| Color | Mocha (Dark) | Latte (Light) | Use For |
+|-------|--------------|---------------|---------|
+| Rosewater | `#f5e0dc` | `#dc8a78` | Subtle highlights |
+| Red | `#f38ba8` | `#d20f39` | Errors, deletions |
+| Green | `#a6e3a1` | `#40a02b` | Success, additions |
+| Yellow | `#f9e2af` | `#df8e1d` | Warnings |
+| Blue | `#89b4fa` | `#1e66f5` | Links, info |
+| Mauve | `#cba6f7` | `#8839ef` | Folders |
+| Text | `#cdd6f4` | `#4c4f69` | Primary text |
+| Subtext | `#a6adc8` | `#6c6f85` | Secondary text |
+| Surface | `#313244` | `#ccd0da` | Backgrounds |
+
 ```go
 // Example: Styled error message
 var errorStyle = lipgloss.NewStyle().

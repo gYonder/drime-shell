@@ -56,7 +56,7 @@ func init() {
 }
 
 // Helper to read file content to string (memory intensive if large, but diff usually is)
-func readFileToString(ctx context.Context, s *session.Session, path string) (string, error) {
+func readFileToString(ctx context.Context, s *session.Session, env *ExecutionEnv, path string) (string, error) {
 	entry, err := ResolveEntry(ctx, s, path)
 	if err != nil {
 		return "", err
@@ -72,7 +72,7 @@ func readFileToString(ctx context.Context, s *session.Session, path string) (str
 	}
 
 	// Download with vault decryption if needed
-	content, err := ui.WithSpinner(os.Stderr, "", false, func() ([]byte, error) {
+	content, err := ui.WithSpinner(env.Stderr, "", false, func() ([]byte, error) {
 		return DownloadAndDecrypt(ctx, s, entry)
 	})
 	if err != nil {
@@ -82,8 +82,8 @@ func readFileToString(ctx context.Context, s *session.Session, path string) (str
 }
 
 // Helper to read file to lines
-func readFileLines(ctx context.Context, s *session.Session, path string) ([]string, error) {
-	content, err := readFileToString(ctx, s, path)
+func readFileLines(ctx context.Context, s *session.Session, env *ExecutionEnv, path string) ([]string, error) {
+	content, err := readFileToString(ctx, s, env, path)
 	if err != nil {
 		return nil, err
 	}
@@ -101,11 +101,11 @@ func diffCmd(ctx context.Context, s *session.Session, env *ExecutionEnv, args []
 	file1 := args[0]
 	file2 := args[1]
 
-	content1, err := readFileLines(ctx, s, file1)
+	content1, err := readFileLines(ctx, s, env, file1)
 	if err != nil {
 		return err
 	}
-	content2, err := readFileLines(ctx, s, file2)
+	content2, err := readFileLines(ctx, s, env, file2)
 	if err != nil {
 		return err
 	}
@@ -152,7 +152,7 @@ func sortCmd(ctx context.Context, s *session.Session, env *ExecutionEnv, args []
 		lines = strings.Split(string(bytes), "\n")
 	} else {
 		path := fs.Arg(0)
-		lines, err = readFileLines(ctx, s, path)
+		lines, err = readFileLines(ctx, s, env, path)
 		if err != nil {
 			return err
 		}
@@ -200,7 +200,7 @@ func uniqCmd(ctx context.Context, s *session.Session, env *ExecutionEnv, args []
 		content = string(bytes)
 	} else {
 		path := fs.Arg(0)
-		content, err = readFileToString(ctx, s, path)
+		content, err = readFileToString(ctx, s, env, path)
 		if err != nil {
 			return err
 		}
@@ -275,7 +275,7 @@ func wcCmd(ctx context.Context, s *session.Session, env *ExecutionEnv, args []st
 	} else {
 		filename = fs.Arg(0)
 		var err error
-		content, err = readFileToString(ctx, s, filename)
+		content, err = readFileToString(ctx, s, env, filename)
 		if err != nil {
 			return err
 		}
@@ -312,6 +312,9 @@ func headCmd(ctx context.Context, s *session.Session, env *ExecutionEnv, args []
 	fs := pflag.NewFlagSet("head", pflag.ContinueOnError)
 	numLines := fs.IntP("lines", "n", 10, "number of lines to show")
 
+	// Convert legacy -N syntax (e.g., -5) to -n N
+	args = convertLegacyNumericFlag(args)
+
 	if err := fs.Parse(args); err != nil {
 		return err
 	}
@@ -332,7 +335,7 @@ func headCmd(ctx context.Context, s *session.Session, env *ExecutionEnv, args []
 		lines = strings.Split(content, "\n")
 	} else {
 		path := fs.Arg(0)
-		lines, err = readFileLines(ctx, s, path)
+		lines, err = readFileLines(ctx, s, env, path)
 		if err != nil {
 			return err
 		}
@@ -358,6 +361,9 @@ func tailCmd(ctx context.Context, s *session.Session, env *ExecutionEnv, args []
 	fs := pflag.NewFlagSet("tail", pflag.ContinueOnError)
 	numLines := fs.IntP("lines", "n", 10, "number of lines to show")
 
+	// Convert legacy -N syntax (e.g., -5) to -n N
+	args = convertLegacyNumericFlag(args)
+
 	if err := fs.Parse(args); err != nil {
 		return err
 	}
@@ -378,7 +384,7 @@ func tailCmd(ctx context.Context, s *session.Session, env *ExecutionEnv, args []
 		lines = strings.Split(content, "\n")
 	} else {
 		path := fs.Arg(0)
-		lines, err = readFileLines(ctx, s, path)
+		lines, err = readFileLines(ctx, s, env, path)
 		if err != nil {
 			return err
 		}
@@ -404,4 +410,23 @@ func tailCmd(ctx context.Context, s *session.Session, env *ExecutionEnv, args []
 // isStdinTTY returns true if stdin is a terminal (not piped)
 func isStdinTTY() bool {
 	return term.IsTerminal(int(os.Stdin.Fd()))
+}
+
+// convertLegacyNumericFlag converts traditional Unix -N syntax (e.g., -5)
+// to the pflag-compatible -n N format for head/tail commands.
+func convertLegacyNumericFlag(args []string) []string {
+	if len(args) == 0 {
+		return args
+	}
+	result := make([]string, 0, len(args)+1)
+	for _, arg := range args {
+		// Check if arg matches -N pattern (e.g., -5, -10, -100)
+		if len(arg) >= 2 && arg[0] == '-' && arg[1] >= '0' && arg[1] <= '9' {
+			// Extract the number part and convert to -n N
+			result = append(result, "-n", arg[1:])
+		} else {
+			result = append(result, arg)
+		}
+	}
+	return result
 }
