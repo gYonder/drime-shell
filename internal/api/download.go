@@ -117,7 +117,7 @@ func (c *HTTPClient) CheckResumeSupport(ctx context.Context, hash string) (bool,
 
 	if contentLength <= 0 {
 		if cl := resp.Header.Get("Content-Length"); cl != "" {
-			fmt.Sscanf(cl, "%d", &contentLength)
+			_, _ = fmt.Sscanf(cl, "%d", &contentLength)
 		}
 	}
 
