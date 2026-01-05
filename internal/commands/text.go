@@ -140,7 +140,7 @@ func sortCmd(ctx context.Context, s *session.Session, env *ExecutionEnv, args []
 	var err error
 
 	if fs.NArg() < 1 {
-		if isStdinTTY() {
+		if isStdinTTY(env.Stdin) {
 			return fmt.Errorf("usage: sort [-r] <file>\n       sort [-r] (reads from stdin when piped)")
 		}
 		// Read from stdin
@@ -189,7 +189,7 @@ func uniqCmd(ctx context.Context, s *session.Session, env *ExecutionEnv, args []
 	var err error
 
 	if fs.NArg() < 1 {
-		if isStdinTTY() {
+		if isStdinTTY(env.Stdin) {
 			return fmt.Errorf("usage: uniq [-c] <file>\n       uniq [-c] (reads from stdin when piped)")
 		}
 		// Read from stdin
@@ -263,7 +263,7 @@ func wcCmd(ctx context.Context, s *session.Session, env *ExecutionEnv, args []st
 	var filename string
 
 	if fs.NArg() < 1 {
-		if isStdinTTY() {
+		if isStdinTTY(env.Stdin) {
 			return fmt.Errorf("usage: wc [-lwc] <file>\n       wc [-lwc] (reads from stdin when piped)")
 		}
 		// Read from stdin
@@ -323,7 +323,7 @@ func headCmd(ctx context.Context, s *session.Session, env *ExecutionEnv, args []
 	var err error
 
 	if fs.NArg() < 1 {
-		if isStdinTTY() {
+		if isStdinTTY(env.Stdin) {
 			return fmt.Errorf("usage: head [-n lines] <file>\n       head [-n lines] (reads from stdin when piped)")
 		}
 		// Read from stdin
@@ -372,7 +372,7 @@ func tailCmd(ctx context.Context, s *session.Session, env *ExecutionEnv, args []
 	var err error
 
 	if fs.NArg() < 1 {
-		if isStdinTTY() {
+		if isStdinTTY(env.Stdin) {
 			return fmt.Errorf("usage: tail [-n lines] <file>\n       tail [-n lines] (reads from stdin when piped)")
 		}
 		// Read from stdin
@@ -407,9 +407,14 @@ func tailCmd(ctx context.Context, s *session.Session, env *ExecutionEnv, args []
 	return nil
 }
 
-// isStdinTTY returns true if stdin is a terminal (not piped)
-func isStdinTTY() bool {
-	return term.IsTerminal(int(os.Stdin.Fd()))
+// isStdinTTY returns true if stdin is a terminal (not piped).
+// When running in a pipeline, env.Stdin will be a pipe reader, not *os.File.
+func isStdinTTY(stdin io.Reader) bool {
+	if f, ok := stdin.(*os.File); ok {
+		return term.IsTerminal(int(f.Fd()))
+	}
+	// If stdin is not an *os.File (e.g., it's a pipe), it's not a TTY
+	return false
 }
 
 // convertLegacyNumericFlag converts traditional Unix -N syntax (e.g., -5)
