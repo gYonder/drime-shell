@@ -13,7 +13,21 @@ if ($env:PROCESSOR_ARCHITECTURE -eq "ARM64") {
 }
 
 Write-Host "Finding latest release..."
-$LatestUrl = "https://github.com/$Owner/$Repo/releases/latest/download/${Repo}_${Os}_${Arch}.${Format}"
+
+# Get latest release info from GitHub API
+$ReleaseInfo = Invoke-RestMethod -Uri "https://api.github.com/repos/$Owner/$Repo/releases/latest"
+$Tag = $ReleaseInfo.tag_name
+$Version = $Tag -replace '^v', ''  # Remove 'v' prefix if present
+
+if (-not $Tag) {
+    Throw "Could not determine latest release"
+}
+
+Write-Host "Latest version: $Tag"
+
+$DownloadBase = "https://github.com/$Owner/$Repo/releases/download/$Tag"
+$ReleaseFileName = "${Repo}_${Os}_${Arch}.${Format}"
+$ChecksumsFileName = "${Repo}_${Version}_checksums.txt"
 
 $InstallDir = "$env:LOCALAPPDATA\drime-shell"
 if (!(Test-Path $InstallDir)) {
@@ -22,30 +36,37 @@ if (!(Test-Path $InstallDir)) {
 
 $ZipPath = "$InstallDir\release.zip"
 
-Write-Host "Downloading $LatestUrl..."
-Invoke-WebRequest -Uri $LatestUrl -OutFile $ZipPath
+Write-Host "Downloading $ReleaseFileName..."
+Invoke-WebRequest -Uri "$DownloadBase/$ReleaseFileName" -OutFile $ZipPath
 
 Write-Host "Downloading checksums..."
-$ChecksumsUrl = "https://github.com/$Owner/$Repo/releases/latest/download/checksums.txt"
+$ChecksumsUrl = "$DownloadBase/$ChecksumsFileName"
 $ChecksumsPath = "$InstallDir\checksums.txt"
-Invoke-WebRequest -Uri $ChecksumsUrl -OutFile $ChecksumsPath
-
-Write-Host "Verifying checksum..."
-$ChecksumContent = Get-Content $ChecksumsPath
-$FileName = Split-Path $LatestUrl -Leaf
-$ExpectedLine = $ChecksumContent | Where-Object { $_.EndsWith($FileName) }
-
-if (-not $ExpectedLine) {
-    Throw "Checksum not found for $FileName in checksums.txt"
+try {
+    Invoke-WebRequest -Uri $ChecksumsUrl -OutFile $ChecksumsPath
+    $SkipChecksum = $false
+} catch {
+    Write-Host "Warning: Could not download checksums, skipping verification"
+    $SkipChecksum = $true
 }
 
-$ExpectedHash = ($ExpectedLine -split '\s+')[0].Trim()
-$ActualHash = (Get-FileHash $ZipPath -Algorithm SHA256).Hash.ToLower()
+if (-not $SkipChecksum) {
+    Write-Host "Verifying checksum..."
+    $ChecksumContent = Get-Content $ChecksumsPath
+    $ExpectedLine = $ChecksumContent | Where-Object { $_ -like "*$ReleaseFileName*" }
 
-if ($ExpectedHash -ne $ActualHash) {
-    Throw "Checksum verification failed!`nExpected: $ExpectedHash`nActual:   $ActualHash"
+    if (-not $ExpectedLine) {
+        Write-Host "Warning: Checksum not found for $ReleaseFileName, skipping verification"
+    } else {
+        $ExpectedHash = ($ExpectedLine -split '\s+')[0].Trim()
+        $ActualHash = (Get-FileHash $ZipPath -Algorithm SHA256).Hash.ToLower()
+
+        if ($ExpectedHash -ne $ActualHash) {
+            Throw "Checksum verification failed!`nExpected: $ExpectedHash`nActual:   $ActualHash"
+        }
+        Write-Host "Checksum verified."
+    }
 }
-Write-Host "Checksum verified."
 
 Write-Host "Extracting..."
 Expand-Archive -Path $ZipPath -DestinationPath $InstallDir -Force

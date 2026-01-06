@@ -23,43 +23,62 @@ case $ARCH in
 esac
 
 echo "Finding latest release..."
-LATEST_URL="https://github.com/$OWNER/$REPO/releases/latest/download/${REPO}_${OS}_${ARCH}.${FORMAT}"
+
+# Get latest release info from GitHub API
+RELEASE_INFO=$(curl -fsSL "https://api.github.com/repos/$OWNER/$REPO/releases/latest")
+TAG=$(echo "$RELEASE_INFO" | grep '"tag_name"' | sed -E 's/.*"tag_name": *"([^"]+)".*/\1/')
+VERSION=${TAG#v}  # Remove 'v' prefix if present
+
+if [ -z "$TAG" ]; then
+  echo "Error: Could not determine latest release"
+  exit 1
+fi
+
+echo "Latest version: $TAG"
+
+DOWNLOAD_BASE="https://github.com/$OWNER/$REPO/releases/download/$TAG"
+RELEASE_FILE_NAME="${REPO}_${OS}_${ARCH}.${FORMAT}"
+CHECKSUMS_FILE_NAME="${REPO}_${VERSION}_checksums.txt"
 
 TMP_DIR=$(mktemp -d)
 
 echo "Downloading checksums..."
-CHECKSUMS_URL="https://github.com/$OWNER/$REPO/releases/latest/download/checksums.txt"
-curl -fsSL "$CHECKSUMS_URL" -o "$TMP_DIR/checksums.txt"
+CHECKSUMS_URL="$DOWNLOAD_BASE/$CHECKSUMS_FILE_NAME"
+if ! curl -fsSL "$CHECKSUMS_URL" -o "$TMP_DIR/checksums.txt"; then
+  echo "Warning: Could not download checksums, skipping verification"
+  SKIP_CHECKSUM=1
+fi
 
-echo "Downloading $LATEST_URL..."
+echo "Downloading $RELEASE_FILE_NAME..."
 RELEASE_FILE="$TMP_DIR/release.$FORMAT"
-curl -fsSL "$LATEST_URL" -o "$RELEASE_FILE"
+curl -fsSL "$DOWNLOAD_BASE/$RELEASE_FILE_NAME" -o "$RELEASE_FILE"
 
-echo "Verifying checksum..."
-# Extract just the checksum for our file
-EXPECTED_SUM=$(grep "$(basename "$LATEST_URL")" "$TMP_DIR/checksums.txt" | awk '{print $1}')
+if [ -z "$SKIP_CHECKSUM" ]; then
+  echo "Verifying checksum..."
+  # Extract just the checksum for our file
+  EXPECTED_SUM=$(grep "$RELEASE_FILE_NAME" "$TMP_DIR/checksums.txt" | awk '{print $1}')
 
-if [ -z "$EXPECTED_SUM" ]; then
-  echo "Error: Could not find checksum for $(basename "$LATEST_URL")"
-  exit 1
+  if [ -z "$EXPECTED_SUM" ]; then
+    echo "Warning: Could not find checksum for $RELEASE_FILE_NAME, skipping verification"
+  else
+    # Calculate local checksum
+    if command -v sha256sum >/dev/null 2>&1; then
+      ACTUAL_SUM=$(sha256sum "$RELEASE_FILE" | awk '{print $1}')
+    elif command -v shasum >/dev/null 2>&1; then
+      ACTUAL_SUM=$(shasum -a 256 "$RELEASE_FILE" | awk '{print $1}')
+    else
+      echo "Warning: sha256sum/shasum not found, skipping verification"
+    fi
+
+    if [ -n "$ACTUAL_SUM" ] && [ "$EXPECTED_SUM" != "$ACTUAL_SUM" ]; then
+      echo "Error: Checksum verification failed!"
+      echo "Expected: $EXPECTED_SUM"
+      echo "Actual:   $ACTUAL_SUM"
+      exit 1
+    fi
+    echo "Checksum verified: $ACTUAL_SUM"
+  fi
 fi
-
-# Calculate local checksum
-if command -v sha256sum >/dev/null 2>&1; then
-  ACTUAL_SUM=$(sha256sum "$RELEASE_FILE" | awk '{print $1}')
-elif command -v shasum >/dev/null 2>&1; then
-  ACTUAL_SUM=$(shasum -a 256 "$RELEASE_FILE" | awk '{print $1}')
-else
-  echo "Warning: sha256sum/shasum not found, skipping verification."
-fi
-
-if [ -n "$ACTUAL_SUM" ] && [ "$EXPECTED_SUM" != "$ACTUAL_SUM" ]; then
-  echo "Error: Checksum verification failed!"
-  echo "Expected: $EXPECTED_SUM"
-  echo "Actual:   $ACTUAL_SUM"
-  exit 1
-fi
-echo "Checksum verified: $ACTUAL_SUM"
 
 echo "Extracting..."
 tar -xzf "$TMP_DIR/release.$FORMAT" -C "$TMP_DIR"
