@@ -19,7 +19,7 @@ func init() {
 
 func cat(ctx context.Context, s *session.Session, env *ExecutionEnv, args []string) error {
 	if len(args) < 1 {
-		return fmt.Errorf("usage: cat <file>...")
+		return fmt.Errorf("usage: cat <file>")
 	}
 
 	for _, path := range args {

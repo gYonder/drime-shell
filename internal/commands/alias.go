@@ -139,7 +139,11 @@ func parseAliasDefinition(def string) (name, value string, ok bool) {
 
 	// Validate name (alphanumeric, underscore, dash only)
 	for _, r := range name {
-		if !((r >= 'a' && r <= 'z') || (r >= 'A' && r <= 'Z') || (r >= '0' && r <= '9') || r == '_' || r == '-') {
+		isLower := r >= 'a' && r <= 'z'
+		isUpper := r >= 'A' && r <= 'Z'
+		isDigit := r >= '0' && r <= '9'
+		isValid := isLower || isUpper || isDigit || r == '_' || r == '-'
+		if !isValid {
 			return "", "", false
 		}
 	}

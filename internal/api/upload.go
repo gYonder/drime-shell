@@ -576,7 +576,7 @@ func (c *HTTPClient) uploadMultipart(ctx context.Context, file *os.File, stat os
 	defer resp.Body.Close()
 
 	if resp.StatusCode != 200 {
-		return nil, fmt.Errorf("Multipart init failed: %s", resp.Status)
+		return nil, fmt.Errorf("multipart init failed: %s", resp.Status)
 	}
 
 	var initRes CreateMultipartResponse
@@ -737,7 +737,7 @@ func (c *HTTPClient) uploadMultipart(ctx context.Context, file *os.File, stat os
 	defer resp.Body.Close()
 
 	if resp.StatusCode != 200 {
-		return nil, fmt.Errorf("Complete failed: %s", resp.Status)
+		return nil, fmt.Errorf("complete failed: %s", resp.Status)
 	}
 
 	// 4. Create Entry

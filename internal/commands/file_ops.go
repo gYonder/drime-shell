@@ -625,7 +625,7 @@ func touch(ctx context.Context, s *session.Session, env *ExecutionEnv, args []st
 	}
 
 	if len(args) < 1 {
-		return fmt.Errorf("usage: touch <file>...")
+		return fmt.Errorf("usage: touch <file>")
 	}
 
 	return ui.WithSpinnerErr(env.Stderr, "", false, func() error {

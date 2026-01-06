@@ -61,7 +61,7 @@ func wsCmd(ctx context.Context, s *session.Session, env *ExecutionEnv, args []st
 		}
 		return renameWorkspace(ctx, s, env, strings.Join(args[1:], " "))
 	case "rm", "delete":
-		var targetID int64 = s.WorkspaceID
+		targetID := s.WorkspaceID
 		if len(args) > 1 {
 			wsID, _, err := ResolveWorkspace(ctx, s, args[1])
 			if err != nil {

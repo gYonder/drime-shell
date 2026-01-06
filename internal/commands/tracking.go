@@ -55,7 +55,7 @@ func track(ctx context.Context, s *session.Session, env *ExecutionEnv, args []st
 			return showTrackingStats(ctx, s, env, entry)
 		case "off":
 			if len(args) < 2 {
-				return fmt.Errorf("usage: track off <file>...")
+				return fmt.Errorf("usage: track off <file>")
 			}
 			return untrack(ctx, s, env, args[1:])
 		}
@@ -76,7 +76,7 @@ func track(ctx context.Context, s *session.Session, env *ExecutionEnv, args []st
 	}
 
 	if flags.NArg() == 0 {
-		return fmt.Errorf("usage: track [options] <file>...")
+		return fmt.Errorf("usage: track [options] <file>")
 	}
 
 	if *off {
@@ -113,7 +113,7 @@ func track(ctx context.Context, s *session.Session, env *ExecutionEnv, args []st
 
 func untrack(ctx context.Context, s *session.Session, env *ExecutionEnv, args []string) error {
 	if len(args) == 0 {
-		return fmt.Errorf("usage: untrack <file>...")
+		return fmt.Errorf("usage: untrack <file>")
 	}
 
 	for _, arg := range args {

@@ -45,7 +45,7 @@ func trashCmd(ctx context.Context, s *session.Session, env *ExecutionEnv, args [
 		return trashList(ctx, s, env)
 	case "restore":
 		if len(args) < 2 {
-			return fmt.Errorf("usage: trash restore <file>...")
+			return fmt.Errorf("usage: trash restore <file>")
 		}
 		return restoreCmd(ctx, s, env, args[1:])
 	case "empty":
@@ -144,7 +144,7 @@ func restoreCmd(ctx context.Context, s *session.Session, env *ExecutionEnv, args
 	files := fs.Args()
 
 	if len(files) == 0 {
-		return fmt.Errorf("usage: restore <file>...\n\nRestore files from trash by name or #ID.\nRun 'trash' to see trashed items and their IDs.")
+		return fmt.Errorf("usage: restore <file>\n\nRestore files from trash by name or #ID\nRun 'trash' to see trashed items and their IDs")
 	}
 
 	// Fetch trash entries

@@ -196,7 +196,7 @@ func rm(ctx context.Context, s *session.Session, env *ExecutionEnv, args []strin
 	}
 
 	if len(patterns) < 1 {
-		return fmt.Errorf("usage: rm [-rf] <path>...")
+		return fmt.Errorf("usage: rm [-rf] <path>")
 	}
 
 	deletedCount := 0

@@ -83,7 +83,7 @@ func starCmd(ctx context.Context, s *session.Session, env *ExecutionEnv, args []
 	}
 	if args[0] == "remove" || args[0] == "rm" {
 		if len(args) < 2 {
-			return fmt.Errorf("usage: star remove <file>...")
+			return fmt.Errorf("usage: star remove <file>")
 		}
 		return unstarCmd(ctx, s, env, args[1:])
 	}
@@ -162,7 +162,7 @@ func starredList(ctx context.Context, s *session.Session, env *ExecutionEnv, arg
 }
 func unstarCmd(ctx context.Context, s *session.Session, env *ExecutionEnv, args []string) error {
 	if len(args) == 0 {
-		return fmt.Errorf("usage: unstar <file>...")
+		return fmt.Errorf("usage: unstar <file>")
 	}
 
 	// Collect entry IDs for all specified files

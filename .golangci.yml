@@ -1,26 +1,34 @@
-# golangci-lint v1.x configuration
-
+version: "2"
 linters:
   enable:
-    - errcheck
-    - gosimple
-    - govet
-    - ineffassign
-    - staticcheck
-    - unused
     - misspell
-
-linters-settings:
-  govet:
-    disable:
-      - fieldalignment
-  errcheck:
-    exclude-functions:
-      - (net/http.ResponseWriter).Write
-      - (io.Writer).Write
-
-issues:
-  exclude-rules:
-    - path: _test\.go
-      linters:
-        - errcheck
+  settings:
+    errcheck:
+      exclude-functions:
+        - (net/http.ResponseWriter).Write
+        - (io.Writer).Write
+    govet:
+      disable:
+        - fieldalignment
+  exclusions:
+    generated: lax
+    presets:
+      - comments
+      - common-false-positives
+      - legacy
+      - std-error-handling
+    rules:
+      - linters:
+          - errcheck
+        path: _test\.go
+    paths:
+      - third_party$
+      - builtin$
+      - examples$
+formatters:
+  exclusions:
+    generated: lax
+    paths:
+      - third_party$
+      - builtin$
+      - examples$

@@ -15,25 +15,27 @@ concurrency:
 
 jobs:
   # Fast lint - runs on all pushes and PRs
+  # Recommended: run lint in a separate job for parallel execution
   lint:
+    name: lint
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v5
       - uses: actions/setup-go@v6
         with:
           go-version-file: go.mod
           cache: true
-      - name: Install golangci-lint
-        run: go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.63.4
       - name: golangci-lint
-        run: golangci-lint run --timeout=5m
+        uses: golangci/golangci-lint-action@v9
+        with:
+          version: v2.7
 
-  # Full test suite - only on Release PRs and other PRs
+  # Full test suite - only on PRs
   test:
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v5
       - uses: actions/setup-go@v6
         with:
           go-version-file: go.mod
@@ -58,16 +60,16 @@ jobs:
     if: github.event_name == 'pull_request' && startsWith(github.head_ref, 'release-please--')
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v5
       - uses: actions/setup-go@v6
         with:
           go-version-file: go.mod
           cache: true
 
-      - name: Install golangci-lint
-        run: go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.63.4
-      - name: Full lint
-        run: golangci-lint run --timeout=5m
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v9
+        with:
+          version: v2.7
 
       - name: Build all targets
         run: |

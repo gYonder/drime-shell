@@ -130,7 +130,7 @@ func formatBytes(b int64) string {
 // Usage: zip archive.zip file1 file2 folder/
 func zipCmd(ctx context.Context, s *session.Session, env *ExecutionEnv, args []string) error {
 	if len(args) < 2 {
-		return fmt.Errorf("usage: zip <archive.zip> <file|folder>...")
+		return fmt.Errorf("usage: zip <archive.zip> <file|folder>")
 	}
 
 	archiveName := args[0]
