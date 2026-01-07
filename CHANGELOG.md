@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.0.2-beta.0](https://github.com/mikael-mansson/drime-shell/compare/v2.0.1-beta.0...v2.0.2-beta.0) (2026-01-07)
+
+
+### Bug Fixes
+
+* **install:** always show source command when PATH not in current session ([dcadacb](https://github.com/mikael-mansson/drime-shell/commit/dcadacb7909dce93052025c9259851772e3053db))
+
 ## [2.0.1-beta.0](https://github.com/mikael-mansson/drime-shell/compare/v2.0.0-beta.0...v2.0.1-beta.0) (2026-01-07)
 
 
