@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.0.1-beta.0](https://github.com/mikael-mansson/drime-shell/compare/v2.0.0-beta.0...v2.0.1-beta.0) (2026-01-07)
+
+
+### Bug Fixes
+
+* **install:** show accurate PATH instructions instead of misleading session reload ([7f8c411](https://github.com/mikael-mansson/drime-shell/commit/7f8c411da5bf59ea7c3ce7de41b5c610be5ebe08))
+
 ## [2.0.0-beta.0](https://github.com/mikael-mansson/drime-shell/compare/v1.3.4-beta.0...v2.0.0-beta.0) (2026-01-07)
 
 
