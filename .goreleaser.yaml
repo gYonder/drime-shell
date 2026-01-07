@@ -37,3 +37,7 @@ changelog:
       - '^chore:'
       - '^docs:'
       - '^test:'
+
+release:
+  # Always mark as latest release (even for pre-releases like beta)
+  make_latest: true

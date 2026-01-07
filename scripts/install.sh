@@ -1,10 +1,6 @@
 #!/bin/bash
 set -euo pipefail
 
-# Require bash 3.0+ for BASH_REMATCH
-[[ -n "${BASH_VERSION:-}" ]] || { echo "error: bash required (not sh/dash/ash)" >&2; exit 1; }
-[[ "${BASH_VERSINFO[0]}" -ge 3 ]] || { echo "error: bash 3.0+ required (found $BASH_VERSION)" >&2; exit 1; }
-
 REPO="drime-shell"
 BINARY="drime"
 INSTALL_DIR="$HOME/.drime-shell/bin"
@@ -57,16 +53,13 @@ case "$ARCH" in x86_64) ;; aarch64|arm64) ARCH="arm64" ;; *) error "unsupported 
 
 command -v curl >/dev/null || error "curl is required"
 command -v tar >/dev/null || error "tar is required"
-command -v mktemp >/dev/null || error "mktemp is required"
-command -v awk >/dev/null || error "awk is required"
-command -v grep >/dev/null || error "grep is required"
 (command -v shasum >/dev/null || command -v sha256sum >/dev/null) || error "shasum or sha256sum is required"
 
 banner
 
 # Resolve latest release tag (GitHub API returns releases in reverse chronological order)
 info "Checking latest version..."
-TAG=$(curl -fsSL --connect-timeout 10 --max-time 30 "https://api.github.com/repos/mikael-mansson/${REPO}/releases" 2>/dev/null | grep -m1 '"tag_name"' | sed 's/.*"tag_name": *"\([^"]*\)".*/\1/')
+TAG=$(curl -fsSL --connect-timeout 10 --max-time 30 "https://api.github.com/repos/mikael-mansson/${REPO}/releases" 2>/dev/null | grep -m1 '"tag_name"' | cut -d'"' -f4)
 [[ -n "$TAG" ]] || error "could not determine latest version (check network or GitHub status)"
 VERSION="${TAG#v}"
 
@@ -75,12 +68,7 @@ DOWNLOAD_URL="https://github.com/mikael-mansson/${REPO}/releases/download/${TAG}
 
 # Skip if current (works even if PATH isn't updated yet)
 CURRENT=$({ "$INSTALL_DIR/$BINARY" --version 2>/dev/null || "$BINARY" --version 2>/dev/null; } || true)
-CURRENT=${CURRENT//$'\r'/}
-CURRENT=${CURRENT//$'\n'/}
-# Handle verbose format: "drime-shell version X.Y.Z (commit...)" or "version vX.Y.Z"
-[[ "$CURRENT" =~ version[[:space:]]+v?([0-9]+\.[0-9]+\.[0-9]+[^[:space:]]*) ]] && CURRENT="${BASH_REMATCH[1]}"
-CURRENT=${CURRENT#v}
-CURRENT=${CURRENT%% *}  # Trim any trailing content
+CURRENT=$(echo "$CURRENT" | grep -oE '[0-9]+\.[0-9]+\.[0-9]+[^[:space:]]*' | head -1 || true)
 [[ "$CURRENT" == "$VERSION" ]] && { success "Already up to date ($VERSION)"; exit 0; }
 
 info "Downloading $TAG..."
@@ -89,7 +77,7 @@ curl -fsSL --connect-timeout 10 --max-time 300 "$DOWNLOAD_URL" -o "$TMP_DIR/arch
 
 # Verify checksum
 CHECKSUM_URL="https://github.com/mikael-mansson/${REPO}/releases/download/${TAG}/${REPO}_${VERSION}_checksums.txt"
-EXPECTED=$(curl -fsSL --connect-timeout 10 --max-time 30 "$CHECKSUM_URL" | awk -v f="$FILENAME" '$2==f || $2==("./" f) {print $1; exit}')
+EXPECTED=$(curl -fsSL --connect-timeout 10 --max-time 30 "$CHECKSUM_URL" | grep "$FILENAME" | cut -d' ' -f1)
 [[ -z "$EXPECTED" ]] && error "checksum not found for $FILENAME"
 ACTUAL=$(shasum -a 256 "$TMP_DIR/archive.tar.gz" 2>/dev/null || sha256sum "$TMP_DIR/archive.tar.gz")
 ACTUAL="${ACTUAL%% *}"
