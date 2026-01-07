@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.0-beta.0](https://github.com/mikael-mansson/drime-shell/compare/v1.2.0-beta.0...v1.3.0-beta.0) (2026-01-07)
+
+
+### Features
+
+* harden install scripts and add update/uninstall commands ([5d3ce6a](https://github.com/mikael-mansson/drime-shell/commit/5d3ce6a4111eb7a8f0bfa444687af5e187c9f97d))
+
 ## [1.2.0-beta.0](https://github.com/mikael-mansson/drime-shell/compare/v1.1.0-beta.0...v1.2.0-beta.0) (2026-01-06)
 
 
