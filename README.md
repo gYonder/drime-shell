@@ -264,8 +264,8 @@ Token priority: `DRIME_TOKEN` env var → config file → interactive prompt.
 ## Development
 
 ```bash
-go build -o drime ./cmd/drime   # Build
-go test ./...                    # Test
+go build -o drime-shell ./cmd/drime   # Build
+go test ./...                          # Test
 ```
 
 See [AGENTS.md](AGENTS.md) for architecture details.

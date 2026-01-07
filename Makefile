@@ -5,8 +5,8 @@ all: fmt lint test build
 
 # Build the binary
 build:
-	@echo "Building drime..."
-	go build -o drime ./cmd/drime
+	@echo "Building drime-shell..."
+	go build -o drime-shell ./cmd/drime
 
 # Run all tests
 test:
@@ -41,12 +41,12 @@ check: fmt lint test
 # Clean build artifacts
 clean:
 	@echo "Cleaning..."
-	rm -f drime
+	rm -f drime-shell
 	rm -f coverage.out coverage.html
 
 # Install to GOPATH/bin
 install:
-	@echo "Installing drime..."
+	@echo "Installing drime-shell..."
 	go install ./cmd/drime
 
 # Release (dry run) - requires goreleaser

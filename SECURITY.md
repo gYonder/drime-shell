@@ -44,4 +44,4 @@ Drime Shell handles sensitive data including:
 - Never share your API token or config file
 - Use strong passwords for vault encryption
 - Review permissions on your config file (`chmod 600 ~/.drime-shell/config.yaml`)
-- Log out when using shared systems (`drime logout`)
+- Log out when using shared systems (`drime-shell logout`)
