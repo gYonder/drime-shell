@@ -8,7 +8,7 @@ param([switch]$Uninstall, [switch]$Help)
 $ErrorActionPreference = "Stop"
 
 $Repo = "drime-shell"
-$Binary = "drime.exe"
+$Binary = "drime-shell.exe"
 $InstallDir = "$env:LOCALAPPDATA\drime-shell"
 $BinaryPath = "$InstallDir\$Binary"
 
@@ -30,7 +30,7 @@ if ($Uninstall) {
         try {
             Remove-Item $BinaryPath -Force -EA Stop
         } catch {
-            Write-Host "Cannot remove binary (is drime running?)" -ForegroundColor Red
+            Write-Host "Cannot remove binary (is drime-shell running?)" -ForegroundColor Red
             exit 1
         }
         if (!(Get-ChildItem $InstallDir -EA SilentlyContinue)) { Remove-Item $InstallDir -Force -EA SilentlyContinue }
@@ -99,4 +99,4 @@ if ($UserPath -notlike "*$InstallDir*") { [Environment]::SetEnvironmentVariable(
 Write-Host ""
 if ($Current) { Write-Host "Updated: $Current -> $Version" -ForegroundColor Green }
 else { Write-Host "Installed: $Version" -ForegroundColor Green }
-Write-Host "Restart your terminal, then run: drime" -ForegroundColor DarkGray
+Write-Host "Restart your terminal, then run: drime-shell" -ForegroundColor DarkGray

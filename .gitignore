@@ -1,10 +1,8 @@
 # Binaries
 /dist/
 /bin/
-/drime
-/drime.exe
-drime-shell
-drime-shell.exe
+/drime-shell
+/drime-shell.exe
 
 # OS specific
 .DS_Store

@@ -2,7 +2,7 @@
 set -euo pipefail
 
 REPO="drime-shell"
-BINARY="drime"
+BINARY="drime-shell"
 INSTALL_DIR="$HOME/.drime-shell/bin"
 
 # Colors (disabled if not tty)
@@ -121,4 +121,4 @@ echo
 if [[ -n "$PATH_ADDED" ]]; then
     info "Added to $PATH_ADDED (session reloaded)"
 fi
-info "Run: drime"
+info "Run: drime-shell"
