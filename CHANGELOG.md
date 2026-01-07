@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.3-beta.0](https://github.com/mikael-mansson/drime-shell/compare/v1.3.2-beta.0...v1.3.3-beta.0) (2026-01-07)
+
+
+### Bug Fixes
+
+* **install:** improve BusyBox/Synology compatibility ([aa24930](https://github.com/mikael-mansson/drime-shell/commit/aa2493080f5cffd5edd997a6797c98d809dd3454))
+
 ## [1.3.2-beta.0](https://github.com/mikael-mansson/drime-shell/compare/v1.3.1-beta.0...v1.3.2-beta.0) (2026-01-07)
 
 
