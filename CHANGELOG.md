@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.2-beta.0](https://github.com/mikael-mansson/drime-shell/compare/v1.3.1-beta.0...v1.3.2-beta.0) (2026-01-07)
+
+
+### Bug Fixes
+
+* simplify install scripts and auto-mark releases as latest ([4db736a](https://github.com/mikael-mansson/drime-shell/commit/4db736ab1a92a9ee7182395ec7d242746f1fc3e5))
+
 ## [1.3.1-beta.0](https://github.com/mikael-mansson/drime-shell/compare/v1.3.0-beta.0...v1.3.1-beta.0) (2026-01-07)
 
 
