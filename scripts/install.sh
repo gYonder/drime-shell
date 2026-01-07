@@ -64,11 +64,10 @@ command -v grep >/dev/null || error "grep is required"
 
 banner
 
-# Resolve latest release tag (via /releases/latest redirect, not asset URL which goes to CDN)
+# Resolve latest release tag (GitHub API returns releases in reverse chronological order)
 info "Checking latest version..."
-LATEST_URL=$(curl -fsSI --connect-timeout 10 --max-time 30 "https://github.com/mikael-mansson/${REPO}/releases/latest" 2>/dev/null | grep -i '^location:' | tr -d '\r' | awk '{print $2}')
-[[ "$LATEST_URL" =~ /tag/([^/]+)$ ]] || error "could not determine latest version (check network or GitHub status)"
-TAG="${BASH_REMATCH[1]}"
+TAG=$(curl -fsSL --connect-timeout 10 --max-time 30 "https://api.github.com/repos/mikael-mansson/${REPO}/releases" 2>/dev/null | grep -m1 '"tag_name"' | sed 's/.*"tag_name": *"\([^"]*\)".*/\1/')
+[[ -n "$TAG" ]] || error "could not determine latest version (check network or GitHub status)"
 VERSION="${TAG#v}"
 
 FILENAME="${REPO}_${OS}_${ARCH}.tar.gz"

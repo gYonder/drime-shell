@@ -43,18 +43,16 @@ $Arch = if ($env:PROCESSOR_ARCHITECTURE -eq "ARM64") { "arm64" } else { "x86_64"
 
 Banner
 
-# Resolve latest release tag (via /releases/latest redirect)
+# Resolve latest release tag (GitHub API returns releases in reverse chronological order)
 Write-Host "Checking latest version..." -ForegroundColor DarkGray
-$LatestUrl = $null
 try {
-    Invoke-WebRequest -Uri "https://github.com/mikael-mansson/${Repo}/releases/latest" -Method Head -MaximumRedirection 0 -TimeoutSec 30 -EA Stop | Out-Null
+    $Releases = Invoke-RestMethod -Uri "https://api.github.com/repos/mikael-mansson/${Repo}/releases" -TimeoutSec 30
+    $Tag = $Releases[0].tag_name
 } catch {
-    if ($_.Exception.Response -and $_.Exception.Response.Headers.Location) {
-        $LatestUrl = $_.Exception.Response.Headers.Location.ToString()
-    }
+    Write-Host "Failed to resolve version (check network or GitHub status)" -ForegroundColor Red; exit 1
 }
-if (!$LatestUrl -or $LatestUrl -notmatch "/tag/([^/]+)$") { Write-Host "Failed to resolve version (check network or GitHub status)" -ForegroundColor Red; exit 1 }
-$Tag = $matches[1]; $Version = $Tag -replace "^v",""
+if (!$Tag) { Write-Host "Failed to resolve version" -ForegroundColor Red; exit 1 }
+$Version = $Tag -replace "^v",""
 
 $Filename = "${Repo}_Windows_${Arch}.zip"
 $DownloadUrl = "https://github.com/mikael-mansson/${Repo}/releases/download/${Tag}/${Filename}"
