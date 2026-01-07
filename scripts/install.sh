@@ -98,6 +98,7 @@ chmod +x "$INSTALL_DIR/$BINARY"
 
 # PATH setup
 [[ "${GITHUB_ACTIONS:-}" == "true" && -n "${GITHUB_PATH:-}" ]] && echo "$INSTALL_DIR" >> "$GITHUB_PATH"
+PATH_ADDED=""
 if [[ ":$PATH:" != *":$INSTALL_DIR:"* ]]; then
     SHELL_NAME=$(basename "${SHELL:-sh}")
     case "$SHELL_NAME" in
@@ -109,9 +110,15 @@ if [[ ":$PATH:" != *":$INSTALL_DIR:"* ]]; then
     mkdir -p "$(dirname "$RC")"
     if ! grep -Fq "$INSTALL_DIR" "$RC" 2>/dev/null; then
         [[ "$SHELL_NAME" == "fish" ]] && echo "fish_add_path \"$INSTALL_DIR\"" >> "$RC" || echo "export PATH=\"$INSTALL_DIR:\$PATH\"" >> "$RC"
+        PATH_ADDED="$RC"
     fi
+    # Add to current session
+    export PATH="$INSTALL_DIR:$PATH"
 fi
 
 echo
 [[ -n "$CURRENT" ]] && success "Updated: $CURRENT → $VERSION" || success "Installed: $VERSION"
-info "Restart your terminal, then run: drime"
+if [[ -n "$PATH_ADDED" ]]; then
+    info "Added to $PATH_ADDED (session reloaded)"
+fi
+info "Run: drime"
