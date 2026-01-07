@@ -59,8 +59,10 @@ banner
 
 # Resolve latest release tag (GitHub API returns releases in reverse chronological order)
 info "Checking latest version..."
-TAG=$(curl -fsSL --connect-timeout 10 --max-time 30 "https://api.github.com/repos/mikael-mansson/${REPO}/releases" 2>/dev/null | grep -m1 '"tag_name"' | cut -d'"' -f4)
-[[ -n "$TAG" ]] || error "could not determine latest version (check network or GitHub status)"
+TAG=$(curl -fsSL --connect-timeout 10 --max-time 30 "https://api.github.com/repos/mikael-mansson/${REPO}/releases" 2>/dev/null | grep '"tag_name"' | head -1 | cut -d'"' -f4)
+if [[ -z "$TAG" ]]; then
+    error "could not determine latest version (check network or GitHub status)"
+fi
 VERSION="${TAG#v}"
 
 FILENAME="${REPO}_${OS}_${ARCH}.tar.gz"
@@ -68,8 +70,12 @@ DOWNLOAD_URL="https://github.com/mikael-mansson/${REPO}/releases/download/${TAG}
 
 # Skip if current (works even if PATH isn't updated yet)
 CURRENT=$({ "$INSTALL_DIR/$BINARY" --version 2>/dev/null || "$BINARY" --version 2>/dev/null; } || true)
-CURRENT=$(echo "$CURRENT" | grep -oE '[0-9]+\.[0-9]+\.[0-9]+[^[:space:]]*' | head -1 || true)
-[[ "$CURRENT" == "$VERSION" ]] && { success "Already up to date ($VERSION)"; exit 0; }
+# Extract version number (works with BusyBox grep)
+CURRENT=$(echo "$CURRENT" | tr ' ' '\n' | grep -E '^v?[0-9]+\.[0-9]+\.[0-9]+' | head -1 | sed 's/^v//' || true)
+if [[ "$CURRENT" == "$VERSION" ]]; then
+    success "Already up to date ($VERSION)"
+    exit 0
+fi
 
 info "Downloading $TAG..."
 TMP_DIR=$(mktemp -d 2>/dev/null || mktemp -d -t 'drime')  # BusyBox fallback
