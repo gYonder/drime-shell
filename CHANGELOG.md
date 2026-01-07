@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.4-beta.0](https://github.com/mikael-mansson/drime-shell/compare/v1.3.3-beta.0...v1.3.4-beta.0) (2026-01-07)
+
+
+### Bug Fixes
+
+* **install:** auto-reload PATH instead of asking to restart terminal ([e9b436c](https://github.com/mikael-mansson/drime-shell/commit/e9b436cb717e380f696fe12241ecac01b3842d96))
+
 ## [1.3.3-beta.0](https://github.com/mikael-mansson/drime-shell/compare/v1.3.2-beta.0...v1.3.3-beta.0) (2026-01-07)
 
 
