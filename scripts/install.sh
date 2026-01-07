@@ -98,15 +98,15 @@ chmod +x "$INSTALL_DIR/$BINARY"
 
 # PATH setup
 [[ "${GITHUB_ACTIONS:-}" == "true" && -n "${GITHUB_PATH:-}" ]] && echo "$INSTALL_DIR" >> "$GITHUB_PATH"
+SHELL_NAME=$(basename "${SHELL:-sh}")
+case "$SHELL_NAME" in
+    zsh)  RC="${ZDOTDIR:-$HOME}/.zshrc" ;;
+    bash) RC="$HOME/.bashrc" ;;
+    fish) RC="${XDG_CONFIG_HOME:-$HOME/.config}/fish/config.fish" ;;
+    *)    RC="$HOME/.profile" ;;
+esac
 PATH_ADDED=""
 if [[ ":$PATH:" != *":$INSTALL_DIR:"* ]]; then
-    SHELL_NAME=$(basename "${SHELL:-sh}")
-    case "$SHELL_NAME" in
-        zsh)  RC="${ZDOTDIR:-$HOME}/.zshrc" ;;
-        bash) RC="$HOME/.bashrc" ;;
-        fish) RC="${XDG_CONFIG_HOME:-$HOME/.config}/fish/config.fish" ;;
-        *)    RC="$HOME/.profile" ;;
-    esac
     mkdir -p "$(dirname "$RC")"
     if ! grep -Fq "$INSTALL_DIR" "$RC" 2>/dev/null; then
         [[ "$SHELL_NAME" == "fish" ]] && echo "fish_add_path \"$INSTALL_DIR\"" >> "$RC" || echo "export PATH=\"$INSTALL_DIR:\$PATH\"" >> "$RC"
@@ -118,6 +118,9 @@ echo
 [[ -n "$CURRENT" ]] && success "Updated: $CURRENT → $VERSION" || success "Installed: $VERSION"
 if [[ -n "$PATH_ADDED" ]]; then
     info "Added to $PATH_ADDED"
+fi
+# Always show how to run if not in current PATH
+if [[ ":$PATH:" != *":$INSTALL_DIR:"* ]]; then
     info "Run: source $RC && drime-shell"
 else
     info "Run: drime-shell"
