@@ -1,5 +1,16 @@
 # Changelog
 
+## [2.0.0-beta.0](https://github.com/mikael-mansson/drime-shell/compare/v1.3.4-beta.0...v2.0.0-beta.0) (2026-01-07)
+
+
+### ⚠ BREAKING CHANGES
+
+* rename binary from drime to drime-shell
+
+### Features
+
+* rename binary from drime to drime-shell ([75d9f4b](https://github.com/mikael-mansson/drime-shell/commit/75d9f4b93bb7605bde1ea9a3e0a9c1ada141443b))
+
 ## [1.3.4-beta.0](https://github.com/mikael-mansson/drime-shell/compare/v1.3.3-beta.0...v1.3.4-beta.0) (2026-01-07)
 
 
