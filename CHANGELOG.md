@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.1-beta.0](https://github.com/mikael-mansson/drime-shell/compare/v1.3.0-beta.0...v1.3.1-beta.0) (2026-01-07)
+
+
+### Bug Fixes
+
+* use GitHub API to get latest release including pre-releases ([8c43177](https://github.com/mikael-mansson/drime-shell/commit/8c43177e97f392103d53cc6236196b754d1252b0))
+
 ## [1.3.0-beta.0](https://github.com/mikael-mansson/drime-shell/compare/v1.2.0-beta.0...v1.3.0-beta.0) (2026-01-07)
 
 
