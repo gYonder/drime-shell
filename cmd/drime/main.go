@@ -3,10 +3,13 @@ package main
 import (
 	"bufio"
 	"context"
+	"encoding/json"
 	"fmt"
+	"net/http"
 	"os"
 	"strings"
 	"syscall"
+	"time"
 
 	"github.com/mikael.mansson2/drime-shell/internal/api"
 	"github.com/mikael.mansson2/drime-shell/internal/build"
@@ -22,7 +25,7 @@ import (
 
 func main() {
 	if len(os.Args) > 1 && os.Args[1] == "--version" {
-		fmt.Printf("drime-shell version %s (commit: %s, date: %s)\n", build.Version, build.Commit, build.Date)
+		fmt.Println(build.Version)
 		os.Exit(0)
 	}
 
@@ -35,6 +38,8 @@ func main() {
 		fmt.Fprintf(os.Stderr, "\r\033[KError loading config: %v\n", err)
 		os.Exit(1)
 	}
+
+	checkForUpdates(cfg)
 
 	// If the token isn't set, we need to ask the user for it
 	if cfg.Token == "" {
@@ -249,4 +254,62 @@ func promptYesNo(question string) bool {
 
 	answer = strings.TrimSpace(strings.ToLower(answer))
 	return answer == "" || answer == "y" || answer == "yes"
+}
+
+func checkForUpdates(cfg *config.Config) {
+	// check once every 24 hours
+	if time.Now().Unix()-cfg.LastUpdateCheck < 24*3600 {
+		return
+	}
+
+	// Update the check time immediately to avoid spamming even if check fails
+	cfg.LastUpdateCheck = time.Now().Unix()
+	_ = config.Save(cfg)
+
+	// Fetch latest release tag
+	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+	defer cancel()
+
+	req, err := http.NewRequestWithContext(ctx, "GET", "https://api.github.com/repos/mikael-mansson/drime-shell/releases/latest", nil)
+	if err != nil {
+		return
+	}
+	req.Header.Set("User-Agent", "drime-shell/"+build.Version)
+
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return
+	}
+
+	var rel struct {
+		TagName string `json:"tag_name"`
+	}
+	if err := json.NewDecoder(resp.Body).Decode(&rel); err != nil {
+		return
+	}
+
+	latest := strings.TrimPrefix(rel.TagName, "v")
+	current := strings.TrimPrefix(build.Version, "v")
+
+	if latest != "" && latest != current {
+		// Clear "Initializing..." line if it hasn't been cleared yet
+		// (though main() prints to stderr, this might interleave.
+		// Safest is to Printf with \r or just print before prompt.
+
+		fmt.Fprintf(os.Stderr, "\r\033[K")
+		fmt.Fprintf(os.Stderr, "%s %s -> %s\n",
+			ui.SuccessStyle.Render("Update available:"),
+			current,
+			rel.TagName,
+		)
+		fmt.Fprintf(os.Stderr, "Run %s to upgrade.\n\n", ui.CommandStyle.Render("drime update"))
+
+		// Restore "Initializing..." just in case if we want, but likely better to leave it cleared as we moved on.
+		// Actually main keeps printing stuff.
+	}
 }

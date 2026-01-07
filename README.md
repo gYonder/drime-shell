@@ -20,15 +20,29 @@ A modern CLI shell for Drime Cloud built in Go. Provides an SSH-like experience 
 - **Tab Completion** — Auto-complete paths and commands
 
 ## Installation
- 
+
 **macOS & Linux:**
+
 ```bash
-curl -fsSL https://raw.githubusercontent.com/mikael-mansson/drime-shell/main/scripts/install.sh | sh
+curl -fsSL https://raw.githubusercontent.com/mikael-mansson/drime-shell/main/scripts/install.sh | bash
 ```
- 
+
 **Windows (PowerShell):**
+
 ```powershell
-iwr https://raw.githubusercontent.com/mikael-mansson/drime-shell/main/scripts/install.ps1 | iex
+powershell -c "irm https://raw.githubusercontent.com/mikael-mansson/drime-shell/main/scripts/install.ps1 | iex"
+```
+
+**Upgrade:** Re-run the install command, or use `drime update` from within the shell.
+
+**Uninstall:**
+
+```bash
+# macOS & Linux
+curl -fsSL https://raw.githubusercontent.com/mikael-mansson/drime-shell/main/scripts/install.sh | bash -s -- --uninstall
+
+# Or from within the shell
+drime uninstall
 ```
 
 ## Quick Start

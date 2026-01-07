@@ -15,6 +15,7 @@ type Config struct {
 	APIURL            string            `yaml:"api_url"`
 	HistorySize       int               `yaml:"history_size"`
 	MaxMemoryBufferMB int               `yaml:"max_memory_buffer_mb"` // Max MB to buffer in memory before using temp files
+	LastUpdateCheck   int64             `yaml:"last_update_check,omitempty"`
 }
 
 const DefaultMaxMemoryBufferMB = 100 // 100MB

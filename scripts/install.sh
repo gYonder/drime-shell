@@ -1,107 +1,124 @@
 #!/bin/bash
-set -e
+set -euo pipefail
 
-OWNER="mikael-mansson"
+# Require bash 3.0+ for BASH_REMATCH
+[[ -n "${BASH_VERSION:-}" ]] || { echo "error: bash required (not sh/dash/ash)" >&2; exit 1; }
+[[ "${BASH_VERSINFO[0]}" -ge 3 ]] || { echo "error: bash 3.0+ required (found $BASH_VERSION)" >&2; exit 1; }
+
 REPO="drime-shell"
 BINARY="drime"
-FORMAT="tar.gz"
-BINDIR="${BINDIR:-$HOME/.local/bin}"
+INSTALL_DIR="$HOME/.drime-shell/bin"
 
+# Colors (disabled if not tty)
+[[ -t 1 ]] && { RED='\033[31m'; GREEN='\033[32m'; DIM='\033[2m'; NC='\033[0m'; } || { RED=''; GREEN=''; DIM=''; NC=''; }
+info()    { echo -e "${DIM}$*${NC}"; }
+success() { echo -e "${GREEN}$*${NC}"; }
+error()   { echo -e "${RED}error: $*${NC}" >&2; exit 1; }
+
+banner() {
+    echo -e "${GREEN}"
+    echo "  ___      _              ___ _        _ _ "
+    echo " |   \\ _ _(_)_ __  ___   / __| |_  ___| | |"
+    echo " | |) | '_| | '  \\/ -_)  \\__ \\ ' \\/ -_) | |"
+    echo " |___/|_| |_|_|_|_\\___|  |___/_||_\\___|_|_|"
+    echo -e "${NC}"
+}
+
+TMP_DIR=""
+cleanup() { [[ -d "${TMP_DIR:-}" ]] && rm -rf "$TMP_DIR"; return 0; }
+trap cleanup EXIT
+
+case "${1:-}" in
+    -h|--help)
+        echo "Drime Shell Installer"
+        echo "Usage: install.sh [--uninstall]"
+        echo "  curl -fsSL https://raw.githubusercontent.com/mikael-mansson/drime-shell/main/scripts/install.sh | bash"
+        exit 0 ;;
+    -u|--uninstall)
+        info "Uninstalling Drime Shell..."
+        BIN="${INSTALL_DIR}/${BINARY}"
+        [[ -f "$BIN" ]] || BIN=$(command -v "$BINARY" 2>/dev/null || true)
+        if [[ -f "$BIN" ]]; then
+            [[ -w "$BIN" ]] || error "not found or not writable"
+            rm "$BIN"
+            success "Removed $BIN"
+        fi
+        exit 0 ;;
+    "") ;; # install
+    *) error "unknown option: $1" ;;
+esac
+
+# Detect OS/Arch
 OS=$(uname -s)
 ARCH=$(uname -m)
+case "$OS" in Darwin|Linux) ;; *) error "unsupported OS: $OS" ;; esac
+case "$ARCH" in x86_64) ;; aarch64|arm64) ARCH="arm64" ;; *) error "unsupported arch: $ARCH" ;; esac
+[[ "$OS" == "Darwin" && "$ARCH" == "x86_64" ]] && sysctl -n sysctl.proc_translated 2>/dev/null | grep -q 1 && ARCH="arm64"
 
-case $OS in
-  Linux) OS="Linux" ;;
-  Darwin) OS="Darwin" ;;
-  *) echo "OS $OS not supported"; exit 1 ;;
-esac
+command -v curl >/dev/null || error "curl is required"
+command -v tar >/dev/null || error "tar is required"
+command -v mktemp >/dev/null || error "mktemp is required"
+command -v awk >/dev/null || error "awk is required"
+command -v grep >/dev/null || error "grep is required"
+(command -v shasum >/dev/null || command -v sha256sum >/dev/null) || error "shasum or sha256sum is required"
 
-case $ARCH in
-  x86_64) ARCH="x86_64" ;;
-  arm64|aarch64) ARCH="arm64" ;;
-  *) echo "Architecture $ARCH not supported"; exit 1 ;;
-esac
+banner
 
-echo "Finding latest release..."
+# Resolve latest release tag (via /releases/latest redirect, not asset URL which goes to CDN)
+info "Checking latest version..."
+LATEST_URL=$(curl -fsSI --connect-timeout 10 --max-time 30 "https://github.com/mikael-mansson/${REPO}/releases/latest" 2>/dev/null | grep -i '^location:' | tr -d '\r' | awk '{print $2}')
+[[ "$LATEST_URL" =~ /tag/([^/]+)$ ]] || error "could not determine latest version (check network or GitHub status)"
+TAG="${BASH_REMATCH[1]}"
+VERSION="${TAG#v}"
 
-# Get latest release info from GitHub API
-RELEASE_INFO=$(curl -fsSL "https://api.github.com/repos/$OWNER/$REPO/releases/latest")
-TAG=$(echo "$RELEASE_INFO" | grep '"tag_name"' | sed -E 's/.*"tag_name": *"([^"]+)".*/\1/')
-VERSION=${TAG#v}  # Remove 'v' prefix if present
+FILENAME="${REPO}_${OS}_${ARCH}.tar.gz"
+DOWNLOAD_URL="https://github.com/mikael-mansson/${REPO}/releases/download/${TAG}/${FILENAME}"
 
-if [ -z "$TAG" ]; then
-  echo "Error: Could not determine latest release"
-  exit 1
-fi
+# Skip if current (works even if PATH isn't updated yet)
+CURRENT=$({ "$INSTALL_DIR/$BINARY" --version 2>/dev/null || "$BINARY" --version 2>/dev/null; } || true)
+CURRENT=${CURRENT//$'\r'/}
+CURRENT=${CURRENT//$'\n'/}
+# Handle verbose format: "drime-shell version X.Y.Z (commit...)" or "version vX.Y.Z"
+[[ "$CURRENT" =~ version[[:space:]]+v?([0-9]+\.[0-9]+\.[0-9]+[^[:space:]]*) ]] && CURRENT="${BASH_REMATCH[1]}"
+CURRENT=${CURRENT#v}
+CURRENT=${CURRENT%% *}  # Trim any trailing content
+[[ "$CURRENT" == "$VERSION" ]] && { success "Already up to date ($VERSION)"; exit 0; }
 
-echo "Latest version: $TAG"
+info "Downloading $TAG..."
+TMP_DIR=$(mktemp -d 2>/dev/null || mktemp -d -t 'drime')  # BusyBox fallback
+curl -fsSL --connect-timeout 10 --max-time 300 "$DOWNLOAD_URL" -o "$TMP_DIR/archive.tar.gz" || error "download failed (URL: $DOWNLOAD_URL)"
 
-DOWNLOAD_BASE="https://github.com/$OWNER/$REPO/releases/download/$TAG"
-RELEASE_FILE_NAME="${REPO}_${OS}_${ARCH}.${FORMAT}"
-CHECKSUMS_FILE_NAME="${REPO}_${VERSION}_checksums.txt"
+# Verify checksum
+CHECKSUM_URL="https://github.com/mikael-mansson/${REPO}/releases/download/${TAG}/${REPO}_${VERSION}_checksums.txt"
+EXPECTED=$(curl -fsSL --connect-timeout 10 --max-time 30 "$CHECKSUM_URL" | awk -v f="$FILENAME" '$2==f || $2==("./" f) {print $1; exit}')
+[[ -z "$EXPECTED" ]] && error "checksum not found for $FILENAME"
+ACTUAL=$(shasum -a 256 "$TMP_DIR/archive.tar.gz" 2>/dev/null || sha256sum "$TMP_DIR/archive.tar.gz")
+ACTUAL="${ACTUAL%% *}"
+[[ "$EXPECTED" == "$ACTUAL" ]] || error "checksum mismatch"
 
-TMP_DIR=$(mktemp -d)
+# Install
+info "Installing..."
+tar -xzf "$TMP_DIR/archive.tar.gz" -C "$TMP_DIR"
+mkdir -p "$INSTALL_DIR"
+mv "$TMP_DIR/$BINARY" "$INSTALL_DIR/"
+chmod +x "$INSTALL_DIR/$BINARY"
 
-echo "Downloading checksums..."
-CHECKSUMS_URL="$DOWNLOAD_BASE/$CHECKSUMS_FILE_NAME"
-if ! curl -fsSL "$CHECKSUMS_URL" -o "$TMP_DIR/checksums.txt"; then
-  echo "Warning: Could not download checksums, skipping verification"
-  SKIP_CHECKSUM=1
-fi
-
-echo "Downloading $RELEASE_FILE_NAME..."
-RELEASE_FILE="$TMP_DIR/release.$FORMAT"
-curl -fsSL "$DOWNLOAD_BASE/$RELEASE_FILE_NAME" -o "$RELEASE_FILE"
-
-if [ -z "$SKIP_CHECKSUM" ]; then
-  echo "Verifying checksum..."
-  # Extract just the checksum for our file
-  EXPECTED_SUM=$(grep "$RELEASE_FILE_NAME" "$TMP_DIR/checksums.txt" | awk '{print $1}')
-
-  if [ -z "$EXPECTED_SUM" ]; then
-    echo "Warning: Could not find checksum for $RELEASE_FILE_NAME, skipping verification"
-  else
-    # Calculate local checksum
-    if command -v sha256sum >/dev/null 2>&1; then
-      ACTUAL_SUM=$(sha256sum "$RELEASE_FILE" | awk '{print $1}')
-    elif command -v shasum >/dev/null 2>&1; then
-      ACTUAL_SUM=$(shasum -a 256 "$RELEASE_FILE" | awk '{print $1}')
-    else
-      echo "Warning: sha256sum/shasum not found, skipping verification"
+# PATH setup
+[[ "${GITHUB_ACTIONS:-}" == "true" && -n "${GITHUB_PATH:-}" ]] && echo "$INSTALL_DIR" >> "$GITHUB_PATH"
+if [[ ":$PATH:" != *":$INSTALL_DIR:"* ]]; then
+    SHELL_NAME=$(basename "${SHELL:-sh}")
+    case "$SHELL_NAME" in
+        zsh)  RC="${ZDOTDIR:-$HOME}/.zshrc" ;;
+        bash) RC="$HOME/.bashrc" ;;
+        fish) RC="${XDG_CONFIG_HOME:-$HOME/.config}/fish/config.fish" ;;
+        *)    RC="$HOME/.profile" ;;
+    esac
+    mkdir -p "$(dirname "$RC")"
+    if ! grep -Fq "$INSTALL_DIR" "$RC" 2>/dev/null; then
+        [[ "$SHELL_NAME" == "fish" ]] && echo "fish_add_path \"$INSTALL_DIR\"" >> "$RC" || echo "export PATH=\"$INSTALL_DIR:\$PATH\"" >> "$RC"
     fi
-
-    if [ -n "$ACTUAL_SUM" ] && [ "$EXPECTED_SUM" != "$ACTUAL_SUM" ]; then
-      echo "Error: Checksum verification failed!"
-      echo "Expected: $EXPECTED_SUM"
-      echo "Actual:   $ACTUAL_SUM"
-      exit 1
-    fi
-    echo "Checksum verified: $ACTUAL_SUM"
-  fi
 fi
 
-echo "Extracting..."
-tar -xzf "$TMP_DIR/release.$FORMAT" -C "$TMP_DIR"
-
-echo "Installing to $BINDIR..."
-mkdir -p "$BINDIR"
-
-# Find the binary (handles whether it's in root or a subdir)
-FOUND_BIN=$(find "$TMP_DIR" -type f -name "$BINARY" | head -n 1)
-
-if [ -z "$FOUND_BIN" ]; then
-  echo "Error: Binary '$BINARY' not found in downloaded release"
-  exit 1
-fi
-
-mv "$FOUND_BIN" "$BINDIR/$BINARY"
-
-chmod +x "$BINDIR/$BINARY"
-rm -rf "$TMP_DIR"
-
-echo "Successfully installed $BINARY to $BINDIR/$BINARY"
-
-if ! echo ":$PATH:" | grep -q ":$BINDIR:"; then
-  echo "Note: add $BINDIR to your PATH (e.g. in ~/.bashrc or ~/.zshrc):"
-  echo "  export PATH=\"$BINDIR:\$PATH\""
-fi
+echo
+[[ -n "$CURRENT" ]] && success "Updated: $CURRENT → $VERSION" || success "Installed: $VERSION"
+info "Restart your terminal, then run: drime"

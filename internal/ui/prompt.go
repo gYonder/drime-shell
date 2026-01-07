@@ -1,7 +1,10 @@
 package ui
 
 import (
+	"bufio"
 	"fmt"
+	"os"
+	"strings"
 
 	"github.com/charmbracelet/lipgloss"
 )
@@ -35,4 +38,15 @@ func RenderPrompt(user, path, contextName string, inVault bool) string {
 
 	sep2 := lipgloss.NewStyle().Foreground(pathBg).Render("")
 	return fmt.Sprintf("%s%s%s%s ", seg1, sep1, seg2, sep2)
+}
+
+// Prompt asks a question and reads a line from stdin
+func Prompt(question string) (string, error) {
+	fmt.Print(question)
+	reader := bufio.NewReader(os.Stdin)
+	response, err := reader.ReadString('\n')
+	if err != nil {
+		return "", err
+	}
+	return strings.TrimSpace(response), nil
 }
