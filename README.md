@@ -33,7 +33,7 @@ curl -fsSL https://raw.githubusercontent.com/mikael-mansson/drime-shell/main/scr
 powershell -c "irm https://raw.githubusercontent.com/mikael-mansson/drime-shell/main/scripts/install.ps1 | iex"
 ```
 
-**Upgrade:** Re-run the install command, or use `drime update` from within the shell.
+**Upgrade:** Re-run the install command, or use `drime-shell update` from within the shell.
 
 **Uninstall:**
 
@@ -42,7 +42,7 @@ powershell -c "irm https://raw.githubusercontent.com/mikael-mansson/drime-shell/
 curl -fsSL https://raw.githubusercontent.com/mikael-mansson/drime-shell/main/scripts/install.sh | bash -s -- --uninstall
 
 # Or from within the shell
-drime uninstall
+drime-shell uninstall
 ```
 
 ## Quick Start
@@ -62,7 +62,7 @@ mkdir -p ~/.drime-shell && echo "token: drm_your_token_here" > ~/.drime-shell/co
 ### Launch
 
 ```bash
-drime
+drime-shell
 ```
 
 The shell uses a Powerline-style prompt with colored segments showing your username and current path:

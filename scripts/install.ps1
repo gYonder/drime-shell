@@ -83,7 +83,7 @@ Write-Host "Installing..." -ForegroundColor DarkGray
 # Check if binary is in use (Windows locks running executables)
 if (Test-Path $BinaryPath) {
     try { [IO.File]::OpenWrite($BinaryPath).Close() }
-    catch { Remove-Item $Zip -Force -EA SilentlyContinue; Write-Host "Cannot update (is drime running?)" -ForegroundColor Red; exit 1 }
+    catch { Remove-Item $Zip -Force -EA SilentlyContinue; Write-Host "Cannot update (is drime-shell running?)" -ForegroundColor Red; exit 1 }
 }
 Expand-Archive -Path $Zip -DestinationPath $InstallDir -Force
 Remove-Item $Zip -Force -EA SilentlyContinue

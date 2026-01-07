@@ -67,7 +67,7 @@ func runUpdate(ctx context.Context, s *session.Session, env *ExecutionEnv, args 
 }
 
 func runUninstall(ctx context.Context, s *session.Session, env *ExecutionEnv, args []string) error {
-	confirm, err := ui.Prompt(fmt.Sprintf("%s\nAre you sure you want to uninstall Drime Shell? [y/N] ", ui.ErrorStyle.Render("WARNING: This will remove the drime binary.")))
+	confirm, err := ui.Prompt(fmt.Sprintf("%s\nAre you sure you want to uninstall Drime Shell? [y/N] ", ui.ErrorStyle.Render("WARNING: This will remove the drime-shell binary.")))
 	if err != nil {
 		return err
 	}
