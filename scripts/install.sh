@@ -112,13 +112,13 @@ if [[ ":$PATH:" != *":$INSTALL_DIR:"* ]]; then
         [[ "$SHELL_NAME" == "fish" ]] && echo "fish_add_path \"$INSTALL_DIR\"" >> "$RC" || echo "export PATH=\"$INSTALL_DIR:\$PATH\"" >> "$RC"
         PATH_ADDED="$RC"
     fi
-    # Add to current session
-    export PATH="$INSTALL_DIR:$PATH"
 fi
 
 echo
 [[ -n "$CURRENT" ]] && success "Updated: $CURRENT → $VERSION" || success "Installed: $VERSION"
 if [[ -n "$PATH_ADDED" ]]; then
-    info "Added to $PATH_ADDED (session reloaded)"
+    info "Added to $PATH_ADDED"
+    info "Run: source $RC && drime-shell"
+else
+    info "Run: drime-shell"
 fi
-info "Run: drime-shell"
