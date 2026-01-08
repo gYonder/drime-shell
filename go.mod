@@ -1,4 +1,4 @@
-module github.com/mikael.mansson2/drime-shell
+module github.com/gYonder/drime-shell
 
 go 1.25.5
 

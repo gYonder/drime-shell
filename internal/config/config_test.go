@@ -4,7 +4,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/mikael.mansson2/drime-shell/internal/config"
+	"github.com/gYonder/drime-shell/internal/config"
 	"github.com/stretchr/testify/assert"
 )
 

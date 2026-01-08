@@ -10,8 +10,8 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/mikael.mansson2/drime-shell/internal/session"
-	"github.com/mikael.mansson2/drime-shell/internal/ui"
+	"github.com/gYonder/drime-shell/internal/session"
+	"github.com/gYonder/drime-shell/internal/ui"
 	"github.com/pmezard/go-difflib/difflib"
 	"github.com/spf13/pflag"
 	"golang.org/x/term"

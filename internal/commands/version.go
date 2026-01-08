@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/mikael.mansson2/drime-shell/internal/build"
-	"github.com/mikael.mansson2/drime-shell/internal/session"
+	"github.com/gYonder/drime-shell/internal/build"
+	"github.com/gYonder/drime-shell/internal/session"
 )
 
 func init() {

@@ -8,13 +8,13 @@ import (
 	"runtime"
 	"syscall"
 
-	"github.com/mikael.mansson2/drime-shell/internal/session"
-	"github.com/mikael.mansson2/drime-shell/internal/ui"
+	"github.com/gYonder/drime-shell/internal/session"
+	"github.com/gYonder/drime-shell/internal/ui"
 )
 
 const (
-	installURLUnix = "https://raw.githubusercontent.com/mikael-mansson/drime-shell/main/scripts/install.sh"
-	installURLWin  = "https://raw.githubusercontent.com/mikael-mansson/drime-shell/main/scripts/install.ps1"
+	installURLUnix = "https://raw.githubusercontent.com/gYonder/drime-shell/main/scripts/install.sh"
+	installURLWin  = "https://raw.githubusercontent.com/gYonder/drime-shell/main/scripts/install.ps1"
 )
 
 func init() {

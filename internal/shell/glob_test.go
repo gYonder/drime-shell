@@ -7,9 +7,9 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/mikael.mansson2/drime-shell/internal/api"
-	"github.com/mikael.mansson2/drime-shell/internal/session"
-	"github.com/mikael.mansson2/drime-shell/internal/shell"
+	"github.com/gYonder/drime-shell/internal/api"
+	"github.com/gYonder/drime-shell/internal/session"
+	"github.com/gYonder/drime-shell/internal/shell"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )

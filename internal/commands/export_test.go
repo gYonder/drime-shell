@@ -3,7 +3,7 @@ package commands
 import (
 	"context"
 
-	"github.com/mikael.mansson2/drime-shell/internal/api"
+	"github.com/gYonder/drime-shell/internal/api"
 )
 
 // CheckCollisionsAndResolveWithPolicyForTest exposes checkCollisionsAndResolveWithPolicy for testing

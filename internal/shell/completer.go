@@ -6,8 +6,8 @@ import (
 	"strings"
 
 	"github.com/chzyer/readline"
-	"github.com/mikael.mansson2/drime-shell/internal/commands"
-	"github.com/mikael.mansson2/drime-shell/internal/session"
+	"github.com/gYonder/drime-shell/internal/commands"
+	"github.com/gYonder/drime-shell/internal/session"
 )
 
 // DrimeCompleter provides tab completion for the shell

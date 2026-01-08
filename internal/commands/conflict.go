@@ -7,7 +7,7 @@ import (
 
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/mikael.mansson2/drime-shell/internal/api"
+	"github.com/gYonder/drime-shell/internal/api"
 )
 
 // ConflictResolution represents the user's choice for handling a file conflict

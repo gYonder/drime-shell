@@ -2,7 +2,7 @@
 .SYNOPSIS
     Drime Shell Installer
 .EXAMPLE
-    irm https://raw.githubusercontent.com/mikael-mansson/drime-shell/main/scripts/install.ps1 | iex
+    irm https://raw.githubusercontent.com/gYonder/drime-shell/main/scripts/install.ps1 | iex
 #>
 param([switch]$Uninstall, [switch]$Help)
 $ErrorActionPreference = "Stop"

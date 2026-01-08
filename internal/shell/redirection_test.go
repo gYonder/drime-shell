@@ -4,7 +4,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/mikael.mansson2/drime-shell/internal/shell"
+	"github.com/gYonder/drime-shell/internal/shell"
 )
 
 // ============================================================================

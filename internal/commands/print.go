@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/mikael.mansson2/drime-shell/internal/session"
+	"github.com/gYonder/drime-shell/internal/session"
 )
 
 func init() {

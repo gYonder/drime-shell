@@ -28,7 +28,7 @@ case "${1:-}" in
     -h|--help)
         echo "Drime Shell Installer"
         echo "Usage: install.sh [--uninstall]"
-        echo "  curl -fsSL https://raw.githubusercontent.com/mikael-mansson/drime-shell/main/scripts/install.sh | bash"
+        echo "  curl -fsSL https://raw.githubusercontent.com/gYonder/drime-shell/main/scripts/install.sh | bash"
         exit 0 ;;
     -u|--uninstall)
         info "Uninstalling Drime Shell..."

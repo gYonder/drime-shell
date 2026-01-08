@@ -8,9 +8,9 @@ import (
 	"strings"
 	"syscall"
 
-	"github.com/mikael.mansson2/drime-shell/internal/config"
-	"github.com/mikael.mansson2/drime-shell/internal/session"
-	"github.com/mikael.mansson2/drime-shell/internal/ui"
+	"github.com/gYonder/drime-shell/internal/config"
+	"github.com/gYonder/drime-shell/internal/session"
+	"github.com/gYonder/drime-shell/internal/ui"
 	"golang.org/x/term"
 )
 

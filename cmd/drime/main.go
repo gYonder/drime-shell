@@ -11,16 +11,16 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/mikael.mansson2/drime-shell/internal/api"
-	"github.com/mikael.mansson2/drime-shell/internal/build"
-	"github.com/mikael.mansson2/drime-shell/internal/config"
-	"github.com/mikael.mansson2/drime-shell/internal/session"
-	"github.com/mikael.mansson2/drime-shell/internal/shell"
-	"github.com/mikael.mansson2/drime-shell/internal/ui"
+	"github.com/gYonder/drime-shell/internal/api"
+	"github.com/gYonder/drime-shell/internal/build"
+	"github.com/gYonder/drime-shell/internal/config"
+	"github.com/gYonder/drime-shell/internal/session"
+	"github.com/gYonder/drime-shell/internal/shell"
+	"github.com/gYonder/drime-shell/internal/ui"
 	"golang.org/x/term"
 
 	// Register commands
-	_ "github.com/mikael.mansson2/drime-shell/internal/commands"
+	_ "github.com/gYonder/drime-shell/internal/commands"
 )
 
 func main() {
@@ -270,7 +270,7 @@ func checkForUpdates(cfg *config.Config) {
 	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
 	defer cancel()
 
-	req, err := http.NewRequestWithContext(ctx, "GET", "https://api.github.com/repos/mikael-mansson/drime-shell/releases/latest", nil)
+	req, err := http.NewRequestWithContext(ctx, "GET", "https://api.github.com/repos/gYonder/drime-shell/releases/latest", nil)
 	if err != nil {
 		return
 	}

@@ -13,10 +13,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/mikael.mansson2/drime-shell/internal/api"
-	"github.com/mikael.mansson2/drime-shell/internal/crypto"
-	"github.com/mikael.mansson2/drime-shell/internal/session"
-	"github.com/mikael.mansson2/drime-shell/internal/ui"
+	"github.com/gYonder/drime-shell/internal/api"
+	"github.com/gYonder/drime-shell/internal/crypto"
+	"github.com/gYonder/drime-shell/internal/session"
+	"github.com/gYonder/drime-shell/internal/ui"
 	"github.com/spf13/pflag"
 )
 

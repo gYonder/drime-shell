@@ -12,7 +12,7 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/mikael.mansson2/drime-shell/internal/api"
+	"github.com/gYonder/drime-shell/internal/api"
 )
 
 // UploadConfig holds configuration for directory uploads

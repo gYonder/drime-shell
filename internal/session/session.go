@@ -4,8 +4,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/mikael.mansson2/drime-shell/internal/api"
-	"github.com/mikael.mansson2/drime-shell/internal/crypto"
+	"github.com/gYonder/drime-shell/internal/api"
+	"github.com/gYonder/drime-shell/internal/crypto"
 )
 
 type Session struct {

@@ -14,7 +14,7 @@ builds:
     main: ./cmd/drime
     binary: drime-shell
     ldflags:
-      - -s -w -X github.com/mikael.mansson2/drime-shell/internal/build.Version={{.Version}} -X github.com/mikael.mansson2/drime-shell/internal/build.Commit={{.Commit}} -X github.com/mikael.mansson2/drime-shell/internal/build.Date={{.Date}}
+      - -s -w -X github.com/gYonder/drime-shell/internal/build.Version={{.Version}} -X github.com/gYonder/drime-shell/internal/build.Commit={{.Commit}} -X github.com/gYonder/drime-shell/internal/build.Date={{.Date}}
 
 archives:
   - format: tar.gz

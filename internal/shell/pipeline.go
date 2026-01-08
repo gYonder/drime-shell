@@ -8,8 +8,8 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/mikael.mansson2/drime-shell/internal/commands"
-	"github.com/mikael.mansson2/drime-shell/internal/session"
+	"github.com/gYonder/drime-shell/internal/commands"
+	"github.com/gYonder/drime-shell/internal/session"
 )
 
 // CommandChain represents a sequence of pipelines connected by &&, ||, or ;

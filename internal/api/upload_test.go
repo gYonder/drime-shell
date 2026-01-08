@@ -9,7 +9,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/mikael.mansson2/drime-shell/internal/api"
+	"github.com/gYonder/drime-shell/internal/api"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
