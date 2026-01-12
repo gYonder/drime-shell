@@ -2,6 +2,10 @@
 
 A modern CLI shell for Drime Cloud built in Go. Provides an SSH-like experience for navigating and managing files on your cloud storage.
 
+<p align="center">
+  <img src="demo.gif" alt="Drime Shell Demo" width="800">
+</p>
+
 ![Go Version](https://img.shields.io/badge/Go-1.25+-00ADD8?style=flat&logo=go)
 ![CI](https://github.com/gYonder/drime-shell/actions/workflows/ci.yml/badge.svg)
 ![CodeQL](https://github.com/gYonder/drime-shell/actions/workflows/codeql.yml/badge.svg)
