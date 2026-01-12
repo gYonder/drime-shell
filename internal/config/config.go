@@ -9,13 +9,12 @@ import (
 )
 
 type Config struct {
-	Aliases           map[string]string `yaml:"aliases,omitempty"` // User-defined command aliases
+	Aliases           map[string]string `yaml:"aliases,omitempty"`
 	Theme             string            `yaml:"theme"`
-	Token             string            `yaml:"token"` // Note: In real app, consider keyring
+	Token             string            `yaml:"token"`
 	APIURL            string            `yaml:"api_url"`
 	HistorySize       int               `yaml:"history_size"`
-	MaxMemoryBufferMB int               `yaml:"max_memory_buffer_mb"` // Max MB to buffer in memory before using temp files
-	LastUpdateCheck   int64             `yaml:"last_update_check,omitempty"`
+	MaxMemoryBufferMB int               `yaml:"max_memory_buffer_mb"`
 }
 
 const DefaultMaxMemoryBufferMB = 100 // 100MB

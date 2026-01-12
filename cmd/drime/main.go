@@ -32,14 +32,15 @@ func main() {
 	// Show immediate feedback - gets cleared before any prompts or replaced by spinner
 	fmt.Fprint(os.Stderr, "Initializing... ⠋")
 
+	updateMsg := make(chan string, 1)
+	go checkForUpdates(updateMsg)
+
 	// Load configuration from file or environment
 	cfg, err := config.Load()
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "\r\033[KError loading config: %v\n", err)
 		os.Exit(1)
 	}
-
-	checkForUpdates(cfg)
 
 	// If the token isn't set, we need to ask the user for it
 	if cfg.Token == "" {
@@ -138,6 +139,14 @@ func main() {
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Failed to start shell: %v\n", err)
 		os.Exit(1)
+	}
+
+	select {
+	case msg := <-updateMsg:
+		if msg != "" {
+			fmt.Fprint(os.Stderr, msg)
+		}
+	default:
 	}
 
 	sh.Run()
@@ -256,18 +265,10 @@ func promptYesNo(question string) bool {
 	return answer == "" || answer == "y" || answer == "yes"
 }
 
-func checkForUpdates(cfg *config.Config) {
-	// check once every 24 hours
-	if time.Now().Unix()-cfg.LastUpdateCheck < 24*3600 {
-		return
-	}
+func checkForUpdates(result chan<- string) {
+	defer close(result)
 
-	// Update the check time immediately to avoid spamming even if check fails
-	cfg.LastUpdateCheck = time.Now().Unix()
-	_ = config.Save(cfg)
-
-	// Fetch latest release tag
-	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
 	req, err := http.NewRequestWithContext(ctx, "GET", "https://api.github.com/repos/gYonder/drime-shell/releases/latest", nil)
@@ -296,20 +297,79 @@ func checkForUpdates(cfg *config.Config) {
 	latest := strings.TrimPrefix(rel.TagName, "v")
 	current := strings.TrimPrefix(build.Version, "v")
 
-	if latest != "" && latest != current {
-		// Clear "Initializing..." line if it hasn't been cleared yet
-		// (though main() prints to stderr, this might interleave.
-		// Safest is to Printf with \r or just print before prompt.
-
-		fmt.Fprintf(os.Stderr, "\r\033[K")
-		fmt.Fprintf(os.Stderr, "%s %s -> %s\n",
+	if latest != "" && semverGreater(latest, current) {
+		msg := fmt.Sprintf("%s %s -> %s\nRun %s to upgrade.\n",
 			ui.SuccessStyle.Render("Update available:"),
 			current,
 			rel.TagName,
-		)
-		fmt.Fprintf(os.Stderr, "Run %s to upgrade.\n\n", ui.CommandStyle.Render("drime update"))
-
-		// Restore "Initializing..." just in case if we want, but likely better to leave it cleared as we moved on.
-		// Actually main keeps printing stuff.
+			ui.CommandStyle.Render("update"))
+		result <- msg
 	}
+}
+
+// semverGreater returns true if version a > b using semantic versioning.
+// Handles versions like "1.2.3", "1.2.3-beta", etc.
+// Returns false if either version is invalid or if a <= b.
+func semverGreater(a, b string) bool {
+	// Handle dev/unknown versions - always consider releases newer than dev
+	if b == "dev" || b == "" {
+		return a != "dev" && a != ""
+	}
+	if a == "dev" || a == "" {
+		return false
+	}
+
+	// Split into version and prerelease parts
+	aParts := strings.SplitN(a, "-", 2)
+	bParts := strings.SplitN(b, "-", 2)
+
+	// Parse major.minor.patch
+	aVer := parseVersion(aParts[0])
+	bVer := parseVersion(bParts[0])
+
+	if aVer == nil || bVer == nil {
+		return false
+	}
+
+	// Compare major.minor.patch
+	for i := 0; i < 3; i++ {
+		if aVer[i] > bVer[i] {
+			return true
+		}
+		if aVer[i] < bVer[i] {
+			return false
+		}
+	}
+
+	// Same version numbers - check prerelease
+	// A release (no prerelease) is greater than a prerelease
+	aHasPrerelease := len(aParts) > 1
+	bHasPrerelease := len(bParts) > 1
+
+	if !aHasPrerelease && bHasPrerelease {
+		return true // 1.0.0 > 1.0.0-beta
+	}
+
+	return false // Equal or b is release and a is prerelease
+}
+
+// parseVersion parses "1.2.3" into [1, 2, 3]. Returns nil on error.
+func parseVersion(s string) []int {
+	parts := strings.Split(s, ".")
+	if len(parts) != 3 {
+		return nil
+	}
+
+	result := make([]int, 3)
+	for i, p := range parts {
+		var n int
+		if _, err := fmt.Sscanf(p, "%d", &n); err != nil {
+			return nil
+		}
+		if n < 0 {
+			return nil
+		}
+		result[i] = n
+	}
+	return result
 }
