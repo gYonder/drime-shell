@@ -4,6 +4,13 @@ All notable changes to Drime Shell will be documented here.
 
 ---
 
+## [1.1.1](https://github.com/gYonder/drime-shell/compare/v1.1.0...v1.1.1) (2026-01-12)
+
+
+### Bug Fixes
+
+* run update check in background with proper semver comparison ([7a47334](https://github.com/gYonder/drime-shell/commit/7a47334f928e139f5457960cd4cf6fdf1ab5790f))
+
 ## [1.1.0](https://github.com/gYonder/drime-shell/compare/v1.0.0...v1.1.0) (2026-01-12)
 
 
