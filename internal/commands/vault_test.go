@@ -77,14 +77,12 @@ func TestVaultCommandInit(t *testing.T) {
 	}
 }
 
-// TestVaultCommandUnlockLock tests the vault unlock and lock commands
-func TestVaultCommandUnlockLock(t *testing.T) {
-	// Setup mock client with existing vault
+// TestVaultCommandEnterExit tests entering vault and exiting back to previous workspace
+func TestVaultCommandEnterExit(t *testing.T) {
 	mockClient := &api.MockDrimeClient{}
 	cache := api.NewFileCache()
 	sess := session.NewSession(mockClient, cache)
 
-	// Generate valid vault metadata
 	password := "testpassword123"
 	salt, _ := crypto.GenerateSalt()
 	key := crypto.DeriveKey(password, salt)
@@ -104,7 +102,20 @@ func TestVaultCommandUnlockLock(t *testing.T) {
 		}, nil
 	}
 
-	// Test unlock
+	mockClient.ListVaultEntriesFunc = func(ctx context.Context, path string) ([]api.FileEntry, error) {
+		return []api.FileEntry{}, nil
+	}
+
+	mockClient.GetVaultFoldersFunc = func(ctx context.Context, userID int64) ([]api.FileEntry, error) {
+		return []api.FileEntry{}, nil
+	}
+
+	sess.WorkspaceID = 123
+	sess.WorkspaceName = "TestWorkspace"
+	sess.CWD = "/Documents"
+	sess.UserID = 1
+	sess.Username = "testuser"
+
 	stdin := strings.NewReader(password + "\n")
 	stdout := &bytes.Buffer{}
 	stderr := &bytes.Buffer{}
@@ -115,42 +126,41 @@ func TestVaultCommandUnlockLock(t *testing.T) {
 	}
 
 	cmd, _ := Get("vault")
-	err := cmd.Run(context.Background(), sess, env, []string{"unlock"})
+	err := cmd.Run(context.Background(), sess, env, []string{})
 	if err != nil {
-		t.Fatalf("vault unlock failed: %v", err)
+		t.Fatalf("vault enter failed: %v", err)
 	}
 
+	if !sess.InVault {
+		t.Error("expected to be in vault after entering")
+	}
 	if !sess.VaultUnlocked {
 		t.Error("expected vault to be unlocked")
 	}
-	if sess.VaultKey == nil {
-		t.Error("expected VaultKey to be set")
-	}
 
-	// Test lock
 	stdout.Reset()
 	stderr.Reset()
-	err = cmd.Run(context.Background(), sess, env, []string{"lock"})
+	err = cmd.Run(context.Background(), sess, env, []string{"exit"})
 	if err != nil {
-		t.Fatalf("vault lock failed: %v", err)
+		t.Fatalf("vault exit failed: %v", err)
 	}
 
-	if sess.VaultUnlocked {
-		t.Error("expected vault to be locked after lock command")
+	if sess.InVault {
+		t.Error("expected to not be in vault after exit")
 	}
-	if sess.VaultKey != nil {
-		t.Error("expected VaultKey to be nil after lock")
+	if sess.WorkspaceID != 123 {
+		t.Errorf("expected to return to workspace 123, got %d", sess.WorkspaceID)
+	}
+	if sess.CWD != "/Documents" {
+		t.Errorf("expected to return to /Documents, got %s", sess.CWD)
 	}
 }
 
-// TestVaultCommandWrongPassword tests unlocking with wrong password
 func TestVaultCommandWrongPassword(t *testing.T) {
-	// Setup mock client with existing vault
 	mockClient := &api.MockDrimeClient{}
 	cache := api.NewFileCache()
 	sess := session.NewSession(mockClient, cache)
 
-	// Generate valid vault metadata with one password
 	correctPassword := "correctpassword"
 	salt, _ := crypto.GenerateSalt()
 	key := crypto.DeriveKey(correctPassword, salt)
@@ -170,7 +180,6 @@ func TestVaultCommandWrongPassword(t *testing.T) {
 		}, nil
 	}
 
-	// Try to unlock with wrong password
 	stdin := strings.NewReader("wrongpassword\n")
 	stdout := &bytes.Buffer{}
 	stderr := &bytes.Buffer{}
@@ -181,7 +190,7 @@ func TestVaultCommandWrongPassword(t *testing.T) {
 	}
 
 	cmd, _ := Get("vault")
-	err := cmd.Run(context.Background(), sess, env, []string{"unlock"})
+	err := cmd.Run(context.Background(), sess, env, []string{})
 	if err == nil {
 		t.Fatal("expected error for wrong password")
 	}
@@ -212,18 +221,10 @@ func TestVaultContextName(t *testing.T) {
 		t.Errorf("expected 'MyWorkspace', got %q", name)
 	}
 
-	// In vault, locked
+	// In vault - should just show "vault" (no lock state)
 	sess.InVault = true
-	sess.VaultUnlocked = false
-	if name := sess.ContextName(); name != "vault:locked" {
-		t.Errorf("expected 'vault:locked', got %q", name)
-	}
-
-	// In vault, unlocked
-	sess.VaultUnlocked = true
-	sess.VaultKey = &crypto.VaultKey{} // Non-nil key
-	if name := sess.ContextName(); name != "vault:unlocked" {
-		t.Errorf("expected 'vault:unlocked', got %q", name)
+	if name := sess.ContextName(); name != "vault" {
+		t.Errorf("expected 'vault', got %q", name)
 	}
 }
 

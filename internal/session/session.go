@@ -119,12 +119,8 @@ func (s *Session) ResolvePathArg(path string) (string, error) {
 // Used in the shell prompt. Returns empty string for default workspace.
 func (s *Session) ContextName() string {
 	if s.InVault {
-		if s.VaultUnlocked {
-			return "vault:unlocked"
-		}
-		return "vault:locked"
+		return "vault"
 	}
-	// Don't show context for default workspace (ID 0)
 	if s.WorkspaceID == 0 {
 		return ""
 	}

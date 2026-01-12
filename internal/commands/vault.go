@@ -55,32 +55,27 @@ func readPassword(env *ExecutionEnv) (string, error) {
 func init() {
 	Register(&Command{
 		Name:        "vault",
-		Description: "Switch to encrypted vault or manage vault state",
+		Description: "Enter encrypted vault or initialize a new vault",
 		Usage: `vault [command]
 
-Switch to vault:
-  vault               Switch to encrypted vault (prompts for password if locked)
+Enter vault:
+  vault               Enter encrypted vault (prompts for password on first access)
+  vault exit          Return to previous workspace
 
-Vault management:
-  vault unlock        Unlock the vault (load encryption key into memory)
-  vault lock          Lock the vault (clear encryption key from memory)
-  vault init          Initialize a new vault (first-time setup)
-
-Return to workspace:
-  ws                  Switch back to default workspace
-  ws <name>           Switch to a specific workspace
+First-time setup:
+  vault init          Initialize a new vault with a password
 
 Cross-transfer (when in vault):
-  cp file.txt /path -w <name|id>   Copy from vault to workspace
-  mv file.txt /path -w <name|id>   Move from vault to workspace
+  cp file.txt /path -w <name|id>   Copy from vault to workspace (decrypts)
+  mv file.txt /path -w <name|id>   Move from vault to workspace (decrypts)
 
 Cross-transfer (when in workspace):
-  cp file.txt /path --vault     Copy from workspace to vault
-  mv file.txt /path --vault     Move from workspace to vault
+  cp file.txt /path --vault        Copy from workspace to vault (encrypts)
+  mv file.txt /path --vault        Move from workspace to vault (encrypts)
 
 Notes:
   - Vault uses client-side AES-256-GCM encryption
-  - Encryption key is derived from your password using PBKDF2
+  - Password is prompted once per session on first vault access
   - Files are encrypted before upload and decrypted after download
   - Vault deletes are permanent (no trash)`,
 		Run: vaultCmd,
@@ -93,15 +88,37 @@ func vaultCmd(ctx context.Context, s *session.Session, env *ExecutionEnv, args [
 	}
 
 	switch strings.ToLower(args[0]) {
-	case "unlock":
-		return unlockVault(ctx, s, env)
-	case "lock":
-		return lockVault(ctx, s, env)
+	case "exit":
+		return exitVault(ctx, s, env)
 	case "init", "create":
 		return initVault(ctx, s, env)
 	default:
 		return fmt.Errorf("unknown vault command: %s (use 'help vault' for usage)", args[0])
 	}
+}
+
+func EnsureVaultUnlocked(ctx context.Context, s *session.Session, env *ExecutionEnv) error {
+	if s.IsVaultUnlocked() {
+		return nil
+	}
+
+	vaultMeta, err := ui.WithSpinner(env.Stdout, "", false, func() (*api.VaultMeta, error) {
+		return s.Client.GetVaultMetadata(ctx)
+	})
+	if err != nil {
+		return fmt.Errorf("failed to check vault: %w", err)
+	}
+
+	if vaultMeta == nil {
+		return fmt.Errorf("no vault found - run 'vault init' to create one")
+	}
+
+	s.VaultID = vaultMeta.ID
+	s.VaultSalt = []byte(vaultMeta.Salt)
+	s.VaultCheck = []byte(vaultMeta.Check)
+	s.VaultCheckIV = []byte(vaultMeta.IV)
+
+	return unlockVaultWithPrompt(ctx, s, env, vaultMeta)
 }
 
 // switchToVault switches the session context to the vault.
@@ -157,32 +174,20 @@ func switchToVault(ctx context.Context, s *session.Session, env *ExecutionEnv) e
 	return nil
 }
 
-// unlockVault unlocks the vault without switching to it.
-func unlockVault(ctx context.Context, s *session.Session, env *ExecutionEnv) error {
-	if s.IsVaultUnlocked() {
-		fmt.Fprintln(env.Stdout, "Vault is already unlocked.")
+func exitVault(ctx context.Context, s *session.Session, env *ExecutionEnv) error {
+	if !s.InVault {
+		fmt.Fprintln(env.Stdout, "Not in vault.")
 		return nil
 	}
 
-	// Check if vault exists
-	vaultMeta, err := ui.WithSpinner(env.Stdout, "", false, func() (*api.VaultMeta, error) {
-		return s.Client.GetVaultMetadata(ctx)
-	})
-	if err != nil {
-		return fmt.Errorf("failed to check vault: %w", err)
+	s.RestoreWorkspaceState()
+
+	if s.WorkspaceID == 0 {
+		fmt.Fprintln(env.Stdout, ui.SuccessStyle.Render("Returned to personal workspace"))
+	} else {
+		fmt.Fprintf(env.Stdout, "%s\n", ui.SuccessStyle.Render("Returned to workspace '"+s.WorkspaceName+"'"))
 	}
-
-	if vaultMeta == nil {
-		return fmt.Errorf("no vault found - run 'vault init' to create one")
-	}
-
-	// Cache vault metadata
-	s.VaultID = vaultMeta.ID
-	s.VaultSalt = []byte(vaultMeta.Salt)
-	s.VaultCheck = []byte(vaultMeta.Check)
-	s.VaultCheckIV = []byte(vaultMeta.IV)
-
-	return unlockVaultWithPrompt(ctx, s, env, vaultMeta)
+	return nil
 }
 
 // unlockVaultWithPrompt prompts for password and unlocks the vault.
@@ -240,26 +245,7 @@ func unlockVaultWithPrompt(ctx context.Context, s *session.Session, env *Executi
 	s.SetVaultKey(vaultKey)
 	s.VaultSalt, _ = crypto.DecodeBase64(vaultMeta.Salt)
 
-	fmt.Fprintln(env.Stdout, ui.SuccessStyle.Render("Vault unlocked"))
-	return nil
-}
-
-// lockVault clears the vault encryption key from memory.
-func lockVault(ctx context.Context, s *session.Session, env *ExecutionEnv) error {
-	if !s.IsVaultUnlocked() {
-		fmt.Fprintln(env.Stdout, "Vault is already locked.")
-		return nil
-	}
-
-	// Clear the key
-	s.ClearVaultKey()
-
-	// If currently in vault, clear the cache (security measure)
-	if s.InVault {
-		s.Cache = api.NewFileCache()
-	}
-
-	fmt.Fprintln(env.Stdout, ui.SuccessStyle.Render("Vault locked (encryption key cleared)"))
+	fmt.Fprintln(env.Stdout, ui.SuccessStyle.Render("Vault unlocked for this session"))
 	return nil
 }
 

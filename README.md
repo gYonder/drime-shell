@@ -171,20 +171,21 @@ Zero-knowledge encrypted storage with client-side AES-256-GCM encryption.
 
 | Command | Description |
 |---------|-------------|
-| `vault` | Enter vault (prompts unlock if locked) |
-| `vault unlock` | Unlock with password |
-| `vault lock` | Lock (clears key from memory) |
+| `vault` | Enter vault (prompts for password on first access) |
+| `vault exit` | Return to previous workspace |
 | `vault init` | First-time setup |
 
-When in vault, the prompt shows the unlock status:
+The vault password is prompted once per session on first vault operation, then remembered until you close the shell.
+
+When in vault, the prompt shows a vault indicator:
 
 ```
- mikael-mansson ❯ ~ ❯ vault:unlocked ❯
+ mikael-mansson ❯ ~ ❯ vault ❯
 ```
 
 Cross-transfer using `--vault` flag or `-w <workspace>`:
 ```bash
-cp --vault secret.pdf /          # Workspace → Vault (encrypts)
+cp --vault secret.pdf /          # Workspace → Vault (encrypts, prompts if needed)
 cp -w 0 secret.pdf /Documents/   # Vault → Workspace (decrypts)
 ```
 

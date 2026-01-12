@@ -33,7 +33,7 @@ func DownloadAndDecrypt(ctx context.Context, s *session.Session, entry *api.File
 	if s.InVault {
 		// Vault: download encrypted and decrypt
 		if !s.VaultUnlocked {
-			return nil, fmt.Errorf("vault is locked, run 'vault unlock' first")
+			return nil, fmt.Errorf("vault session error - please re-enter vault")
 		}
 		if entry.IV == "" {
 			return nil, fmt.Errorf("file has no IV (not encrypted?)")

@@ -69,9 +69,8 @@ func mv(ctx context.Context, s *session.Session, env *ExecutionEnv, args []strin
 		if s.InVault {
 			return fmt.Errorf("mv: already in vault - use -w <workspace> to move to a workspace")
 		}
-		// Moving from workspace to vault - requires vault to be unlocked
-		if !s.IsVaultUnlocked() {
-			return fmt.Errorf("mv: vault is locked - run 'vault unlock' first")
+		if err := EnsureVaultUnlocked(ctx, s, env); err != nil {
+			return fmt.Errorf("mv: %w", err)
 		}
 		dest := args[len(args)-1]
 		sources := args[:len(args)-1]
@@ -84,10 +83,6 @@ func mv(ctx context.Context, s *session.Session, env *ExecutionEnv, args []strin
 	}
 
 	if targetWorkspaceID != nil && s.InVault {
-		// Moving from vault to workspace
-		if !s.IsVaultUnlocked() {
-			return fmt.Errorf("mv: vault is locked - run 'vault unlock' first")
-		}
 		dest := args[len(args)-1]
 		sources := args[:len(args)-1]
 		// Move = copy from vault then delete from vault
@@ -357,9 +352,8 @@ func cp(ctx context.Context, s *session.Session, env *ExecutionEnv, args []strin
 		if s.InVault {
 			return fmt.Errorf("cp: already in vault - use -w <workspace> to copy to a workspace")
 		}
-		// Copying from workspace to vault - requires vault to be unlocked
-		if !s.IsVaultUnlocked() {
-			return fmt.Errorf("cp: vault is locked - run 'vault unlock' first")
+		if err := EnsureVaultUnlocked(ctx, s, env); err != nil {
+			return fmt.Errorf("cp: %w", err)
 		}
 		dest := args[len(args)-1]
 		sources := args[:len(args)-1]
@@ -367,10 +361,6 @@ func cp(ctx context.Context, s *session.Session, env *ExecutionEnv, args []strin
 	}
 
 	if targetWorkspaceID != nil && s.InVault {
-		// Copying from vault to workspace
-		if !s.IsVaultUnlocked() {
-			return fmt.Errorf("cp: vault is locked - run 'vault unlock' first")
-		}
 		dest := args[len(args)-1]
 		sources := args[:len(args)-1]
 		return copyFromVault(ctx, s, env, sources, dest, *recursive, *targetWorkspaceID)
@@ -620,7 +610,7 @@ func touch(ctx context.Context, s *session.Session, env *ExecutionEnv, args []st
 	// Vault requires encryption key to be loaded
 	if s.InVault {
 		if !s.VaultUnlocked || s.VaultKey == nil {
-			return fmt.Errorf("touch: vault is locked, run 'vault unlock' first")
+			return fmt.Errorf("touch: vault session error - please re-enter vault")
 		}
 	}
 

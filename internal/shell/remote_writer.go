@@ -36,7 +36,7 @@ func NewRemoteFileWriterWithMode(ctx context.Context, s *session.Session, remote
 	// Vault requires encryption key to be loaded
 	if s.InVault {
 		if !s.VaultUnlocked || s.VaultKey == nil {
-			return nil, fmt.Errorf("cannot redirect output: vault is locked, run 'vault unlock' first")
+			return nil, fmt.Errorf("cannot redirect output: vault session error - please re-enter vault")
 		}
 	}
 	f, err := os.CreateTemp("", "drime-redir-*")

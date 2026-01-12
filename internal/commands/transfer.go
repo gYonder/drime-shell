@@ -824,7 +824,7 @@ func edit(ctx context.Context, s *session.Session, env *ExecutionEnv, args []str
 
 	// Check vault state before proceeding
 	if s.InVault && !s.VaultUnlocked {
-		return fmt.Errorf("edit: vault is locked, run 'vault unlock' first")
+		return fmt.Errorf("edit: vault session error - please re-enter vault")
 	}
 
 	// Download content (with decryption for vault)
@@ -999,7 +999,7 @@ func extractZip(zipPath string, destDir string) error {
 // Files are encrypted client-side before upload.
 func uploadToVault(ctx context.Context, s *session.Session, env *ExecutionEnv, args []string) error {
 	if !s.VaultUnlocked {
-		return fmt.Errorf("upload: vault is locked, run 'vault unlock' first")
+		return fmt.Errorf("upload: vault session error - please re-enter vault")
 	}
 	if s.VaultKey == nil {
 		return fmt.Errorf("upload: vault key not available")
@@ -1177,7 +1177,7 @@ func ensureVaultFolder(ctx context.Context, s *session.Session, path string) err
 // downloadVaultFile downloads and decrypts a single file from the vault
 func downloadVaultFile(ctx context.Context, s *session.Session, env *ExecutionEnv, entry *api.FileEntry, localPath string) error {
 	if !s.VaultUnlocked {
-		return fmt.Errorf("download: vault is locked, run 'vault unlock' first")
+		return fmt.Errorf("download: vault session error - please re-enter vault")
 	}
 	if s.VaultKey == nil {
 		return fmt.Errorf("download: vault key not available")
@@ -1241,7 +1241,7 @@ func downloadVaultFile(ctx context.Context, s *session.Session, env *ExecutionEn
 // downloadVaultDirectory downloads and decrypts a directory from the vault
 func downloadVaultDirectory(ctx context.Context, s *session.Session, env *ExecutionEnv, entry *api.FileEntry, remotePath, localPath string) error {
 	if !s.VaultUnlocked {
-		return fmt.Errorf("download: vault is locked, run 'vault unlock' first")
+		return fmt.Errorf("download: vault session error - please re-enter vault")
 	}
 
 	// List all files in the directory recursively (use hash)
