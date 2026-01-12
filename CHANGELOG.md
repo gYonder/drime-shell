@@ -4,6 +4,13 @@ All notable changes to Drime Shell will be documented here.
 
 ---
 
+## [1.1.0](https://github.com/gYonder/drime-shell/compare/v1.0.0...v1.1.0) (2026-01-12)
+
+
+### Features
+
+* simplify vault UX - prompt once per session, add vault exit ([fd6afb8](https://github.com/gYonder/drime-shell/commit/fd6afb88b53a83e345eee7b6518b866b1862596c))
+
 ## [1.0.0](https://github.com/gYonder/drime-shell/releases/tag/v1.0.0) (2026-01-11)
 
 Initial stable release.
