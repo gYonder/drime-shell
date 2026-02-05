@@ -10,7 +10,7 @@ require (
 	github.com/charmbracelet/bubbletea v1.3.10
 	github.com/charmbracelet/lipgloss v1.1.1-0.20250404203927-76690c660834
 	github.com/chzyer/readline v1.5.1
-	github.com/gabriel-vasile/mimetype v1.4.12
+	github.com/gabriel-vasile/mimetype v1.4.13
 	github.com/mattn/go-runewidth v0.0.19
 	github.com/pmezard/go-difflib v1.0.0
 	github.com/shirou/gopsutil/v3 v3.24.5
