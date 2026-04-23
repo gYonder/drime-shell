@@ -17,7 +17,7 @@ jobs:
   release-please:
     runs-on: ubuntu-latest
     steps:
-      - uses: googleapis/release-please-action@v4
+      - uses: googleapis/release-please-action@v5
         with:
           # NOTE: A PAT (RELEASE_PLEASE_TOKEN) is required to trigger other
           # workflows (like GoReleaser) when a release is created.
