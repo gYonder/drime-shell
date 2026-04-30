@@ -90,8 +90,8 @@ func (c *HTTPClient) CreateWorkspace(ctx context.Context, name string) (*Workspa
 
 	if status == http.StatusUnprocessableEntity {
 		var errResp struct {
-			Message string                 `json:"message"`
-			Errors  map[string]interface{} `json:"errors"`
+			Message string         `json:"message"`
+			Errors  map[string]any `json:"errors"`
 		}
 		if err := json.Unmarshal(respBody, &errResp); err == nil {
 			// Build error message from validation errors
@@ -101,7 +101,7 @@ func (c *HTTPClient) CreateWorkspace(ctx context.Context, name string) (*Workspa
 					switch v := val.(type) {
 					case string:
 						errMsgs = append(errMsgs, fmt.Sprintf("%s: %s", field, v))
-					case []interface{}:
+					case []any:
 						for _, msg := range v {
 							errMsgs = append(errMsgs, fmt.Sprintf("%s: %v", field, msg))
 						}
@@ -245,7 +245,7 @@ func (c *HTTPClient) GetWorkspaceRoles(ctx context.Context) ([]WorkspaceRole, er
 
 // InviteMember invites users to a workspace
 func (c *HTTPClient) InviteMember(ctx context.Context, workspaceID int64, emails []string, roleID int) error {
-	body := map[string]interface{}{
+	body := map[string]any{
 		"emails":  emails,
 		"role_id": roleID,
 	}
@@ -266,12 +266,12 @@ func (c *HTTPClient) CancelInvite(ctx context.Context, inviteID int64) error {
 }
 
 // ChangeMemberRole changes the role of a member or invite
-func (c *HTTPClient) ChangeMemberRole(ctx context.Context, workspaceID int64, memberID interface{}, roleID int, isInvite bool) error {
+func (c *HTTPClient) ChangeMemberRole(ctx context.Context, workspaceID int64, memberID any, roleID int, isInvite bool) error {
 	typeStr := "member"
 	if isInvite {
 		typeStr = "invite"
 	}
-	body := map[string]interface{}{
+	body := map[string]any{
 		"role_id": roleID,
 	}
 	path := fmt.Sprintf("/workspace/%d/%s/%v/change-role", workspaceID, typeStr, memberID)

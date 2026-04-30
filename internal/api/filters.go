@@ -7,10 +7,10 @@ import (
 
 // Filter represents a single search filter
 type Filter struct {
-	Key        string      `json:"key"`
-	Value      interface{} `json:"value"`
-	Operator   string      `json:"operator"`
-	IsInactive bool        `json:"isInactive,omitempty"`
+	Key        string `json:"key"`
+	Value      any    `json:"value"`
+	Operator   string `json:"operator"`
+	IsInactive bool   `json:"isInactive,omitempty"`
 }
 
 // Filter Keys

@@ -41,7 +41,7 @@ func WithSpinner[T any](w io.Writer, message string, immediate bool, action func
 	if w == nil {
 		w = os.Stderr
 	}
-	
+
 	fmt.Fprintf(w, "\r%s %s", message, spinnerFrames[frame])
 
 	for {

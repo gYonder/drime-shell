@@ -31,7 +31,7 @@ func (c *HTTPClient) RestoreEntries(ctx context.Context, entryIDs []int64, works
 
 // EmptyTrash permanently deletes all items in trash
 func (c *HTTPClient) EmptyTrash(ctx context.Context, workspaceID int64) error {
-	body := map[string]interface{}{
+	body := map[string]any{
 		"entryIds":   []int64{},
 		"emptyTrash": true,
 	}
@@ -54,7 +54,7 @@ func (c *HTTPClient) EmptyTrash(ctx context.Context, workspaceID int64) error {
 
 // DeleteEntriesForever permanently deletes entries (bypasses trash)
 func (c *HTTPClient) DeleteEntriesForever(ctx context.Context, entryIDs []int64, workspaceID int64) error {
-	body := map[string]interface{}{
+	body := map[string]any{
 		"entryIds":      entryIDs,
 		"deleteForever": true,
 	}

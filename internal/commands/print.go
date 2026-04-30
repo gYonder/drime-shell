@@ -48,8 +48,7 @@ func printf(ctx context.Context, s *session.Session, env *ExecutionEnv, args []s
 	format := args[0]
 	// ... (omitted comment)
 
-	// Convert args to interface{}
-	params := make([]interface{}, len(args)-1)
+	params := make([]any, len(args)-1)
 	for i, v := range args[1:] {
 		params[i] = v
 	}

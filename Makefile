@@ -41,6 +41,7 @@ check: fmt lint test
 # Clean build artifacts
 clean:
 	@echo "Cleaning..."
+	rm -f drime drime.exe
 	rm -f drime-shell
 	rm -f coverage.out coverage.html
 
@@ -62,7 +63,7 @@ release:
 
 # Run the application
 run: build
-	./drime
+	./drime-shell
 
 # Download dependencies
 deps:

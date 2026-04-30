@@ -46,7 +46,7 @@ type DrimeClient interface {
 	InviteMember(ctx context.Context, workspaceID int64, emails []string, roleID int) error
 	RemoveMember(ctx context.Context, workspaceID int64, memberID int64) error
 	CancelInvite(ctx context.Context, inviteID int64) error
-	ChangeMemberRole(ctx context.Context, workspaceID int64, memberID interface{}, roleID int, isInvite bool) error
+	ChangeMemberRole(ctx context.Context, workspaceID int64, memberID any, roleID int, isInvite bool) error
 
 	// Navigation & Listing
 	GetUserFolders(ctx context.Context, userID int64, workspaceID int64) ([]FileEntry, error)
@@ -128,7 +128,7 @@ type MockDrimeClient struct {
 	InviteMemberFunc      func(ctx context.Context, workspaceID int64, emails []string, roleID int) error
 	RemoveMemberFunc      func(ctx context.Context, workspaceID int64, memberID int64) error
 	CancelInviteFunc      func(ctx context.Context, inviteID int64) error
-	ChangeMemberRoleFunc  func(ctx context.Context, workspaceID int64, memberID interface{}, roleID int, isInvite bool) error
+	ChangeMemberRoleFunc  func(ctx context.Context, workspaceID int64, memberID any, roleID int, isInvite bool) error
 
 	GetUserFoldersFunc            func(ctx context.Context, userID int64, workspaceID int64) ([]FileEntry, error)
 	GetFolderPathFunc             func(ctx context.Context, folderHash string, workspaceID int64) ([]FileEntry, error)
@@ -233,7 +233,7 @@ func (m *MockDrimeClient) CancelInvite(ctx context.Context, inviteID int64) erro
 	return nil
 }
 
-func (m *MockDrimeClient) ChangeMemberRole(ctx context.Context, workspaceID int64, memberID interface{}, roleID int, isInvite bool) error {
+func (m *MockDrimeClient) ChangeMemberRole(ctx context.Context, workspaceID int64, memberID any, roleID int, isInvite bool) error {
 	if m.ChangeMemberRoleFunc != nil {
 		return m.ChangeMemberRoleFunc(ctx, workspaceID, memberID, roleID, isInvite)
 	}

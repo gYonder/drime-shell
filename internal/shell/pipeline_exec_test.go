@@ -90,8 +90,6 @@ func setupMockCommands() func() {
 	}
 }
 
-
-
 func TestPipeline_Execute_FourCommands(t *testing.T) {
 	cleanup := setupMockCommands()
 	defer cleanup()

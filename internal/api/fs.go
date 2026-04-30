@@ -208,7 +208,7 @@ func (c *HTTPClient) ExtractEntry(ctx context.Context, entryID int64, parentID *
 	if parentID != nil {
 		pid = *parentID
 	}
-	body := map[string]interface{}{
+	body := map[string]any{
 		"parentId": pid,
 		"password": nil,
 	}
