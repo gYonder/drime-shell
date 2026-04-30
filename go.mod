@@ -1,6 +1,6 @@
 module github.com/gYonder/drime-shell
 
-go 1.26.1
+go 1.25.5
 
 require (
 	github.com/alecthomas/chroma/v2 v2.24.1
